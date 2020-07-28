@@ -1,0 +1,26 @@
+﻿{{-
+
+$hostname = $1
+
+$valid = (object.size $hostname) > 0
+
+setfilename "/etc/hosts"
+setvalid $valid "Hostname is missing"
+
+if !$valid
+ ret
+end
+
+-}}
+127.0.0.1 localhost
+::1 localhost ip6-localhost ip6-loopback
+
+127.0.1.1 {{ $hostname }}
+
+# The following lines are desirable for IPv6 capable hosts
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+{{ for $host in Hosts -}}
+{{ $host.Address }} {{ $host.Name }}
+{{ end -}}

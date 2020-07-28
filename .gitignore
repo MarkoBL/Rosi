@@ -1,0 +1,9 @@
+.vs/
+bin/
+obj/
+._*
+.DS*
+*.user
+single/
+multi/
+*.zip

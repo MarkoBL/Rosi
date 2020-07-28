@@ -1,0 +1,3 @@
+#!/usr/local/bin/rosi 
+// set: rosi.waitafterexit 1
+// include: Shebang.cs

@@ -1,0 +1,221 @@
+name: Releases
+
+on:
+  push:
+    tags:
+       - 'v*'
+jobs:
+
+  nuget:
+
+    name: Upload Nuget Package
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    - name: Pack
+      run: dotnet pack Runtime/Rosi.Runtime.csproj --configuration Release --no-restore --output nuget  
+    - name: Upload
+      run: dotnet nuget push nuget/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      
+  createrelease:
+
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    outputs:
+      releaseuploadurl: ${{ steps.create_release.outputs.upload_url }}
+      
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  buildlinux64:
+    
+    name: Linux Build x64
+    runs-on: ubuntu-latest
+    needs: createrelease
+    
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: "3.1.x"
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build Single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+
+    - name: Zip Single
+      run: cd single && zip -9 -r ../single.zip . -x *.pdb
+      
+    - name: Build Multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+
+    - name: Zip Multi
+      run: cd multi && zip -9 -r ../multi.zip . -x *.pdb
+      
+    - name: Upload Single Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./single.zip
+        asset_name: Rosi_Linux_x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Multi Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./multi.zip
+        asset_name: Rosi_Linux_Multi_x64.zip
+        asset_content_type: application/zip
+        
+  buildmacos64:
+
+    name: macOS Build x64
+    runs-on: macos-latest
+    needs: createrelease
+    
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: "3.1.x"
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build Single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+
+    - name: Zip Single
+      run: cd single && zip -9 -r ../single.zip . -x *.pdb
+      
+    - name: Build Multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+
+    - name: Zip Multi
+      run: cd multi && zip -9 -r ../multi.zip . -x *.pdb
+
+    - name: Build Mac App
+      run: cd MacApp && ./build.sh
+
+    - name: Upload Single Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./single.zip
+        asset_name: Rosi_MacOs_x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Multi Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./multi.zip
+        asset_name: Rosi_MacOs_Multi_x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Mac App
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./macapp.zip
+        asset_name: Rosi_MacOs_App_x64.zip
+        asset_content_type: application/zip
+        
+  buildwindows64:
+    
+    name: Windows Build x64
+    runs-on: windows-latest
+    needs: createrelease
+    
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: "3.1.x"
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build Single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+
+    - name: Zip Single
+      run: cd single && del *.pdb && tar -a -cf ..\single.zip *.*
+      
+    - name: Build Multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+
+    - name: Zip Multi
+      run: cd multi && del *.pdb && tar -a -cf ../multi.zip *.*
+      
+    - name: Upload Single Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./single.zip
+        asset_name: Rosi_Windows_x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Multi Zip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./multi.zip
+        asset_name: Rosi_Windows_Multi_x64.zip
+        asset_content_type: application/zip
+        
