@@ -6,33 +6,34 @@
 
 **The power of the .NET Core Framework in a single executable**
 
-**Rosi** is an easy way to run your C# scripts everywhere, especially on Linux. No need to mess around with your package management. **Rosi** is just a single executable file that you need to run all your C# scripts. 
+**Rosi** is an easy way to run your C# code everywhere, especially on Linux and macOS. No need to mess around with package management. **Rosi** is just a single executable file that you need to run your C# code. Just put it on your USB drive and you're done.
 
-Depending on your needs, you implement your sync/asnyc interface and you're ready to run your first script.
+> Side note: We use **Rosi** on desktop computers for automation to help the users get their stuff done faster (generate reports, process Excel sheets, etc). We usually put all the script files into a readonly network share and the users just have to double click on the correct `.rosi` file. No need to build and deploy binary files to individual computers (what a nightmare), it is 100% independent from the users operating system and we still get the native speed of the .NET Core framework. We only replace the script files on the network share and we're done.
+
+
+You only have to modify your code to impelement the `IRosi` or `IAsyncRosi` and you're done.
 
 ```Csharp
+using System;
+
 public class Rosi : IRosi
 {
     public int Run(IRuntime runtime)
     {
-        // do something
+        Console.WriteLine("Hello World");
+        return 0;
     }
 }
 ```
 
-```Csharp
-public class RosiAsync : IAsyncRosi
-{
-    public async Task<int> Run(IRuntime runtime)
-    {
-        // do something async
-    }
-}
+```
+> rosi HelloWord.cs
+Hello World!
 ```
 
-> Side note: We use [SaltStack](https://www.saltstack.com/) to manage our servers and the servers from our customers. It is a great and simple way to automate the management of our infrastructure. And therefore we have some rules, two of them are: We don't configure anything by hand, everything is done by using salt and we don't touch the package management of a system and add any external sources, if it's not really required. Using salt only is often not enough, we have to write scripts here and there to glue everything together. And we usually used [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) scripts. But while you can writing complex scripts in bash, you usually don't want to do that.
+> Side note: We use [SaltStack](https://www.saltstack.com/) to manage our servers and the servers from our customers. It is a great and simple way to automate the management of our infrastructure. And therefore we have some rules, two of them are: We don't configure anything by hand, everything is done by using salt and we don't touch the package management of a system and add any external sources, if it's not really required. Using salt only is often not enough, we have to write scripts here and there to glue everything together. And we used [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) scripts. But while you can writing complex scripts in bash, you usually don't want to do that.
 
-> We thought about using a real programming language with good debugging support that runs on all important operating systems and we decided to use C# (seriously, it's a great language, static typed languages ftw!). But installing the .NET Core runtime on every system is a little overkill for running small scripts and didn't play nice with our own rules. That's the reason we build **Rosi**.
+> We thought about using a real programming language with good debugging support that runs on all important operating systems and we decided to use C# (seriously, it's a great language, static typed languages ftw!). But installing the .NET Core runtime on every system is a little overkill for running small scripts and didn't play nice with our own rules. **Rosi** was the solution to this problem.
 
 ## Install
 
