@@ -52,5 +52,15 @@ namespace Rosi.Tests
             if (UnitTest)
                 Assert.False(result == 0, "Arguments failed.");
         }
+
+        [Fact]
+        public static async Task Execute()
+        {
+            var runtime = NewRuntime<Execute.Execute>("Execute/Execute.cs");
+
+            var result = await runtime.RunAsync();
+            if (UnitTest)
+                Assert.False(result == 0, "Arguments failed.");
+        }
     }
 }

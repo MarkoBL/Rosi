@@ -12,6 +12,7 @@ namespace Rosi.Playground
 
             Test.Debug = true;
 
+            await Test.Execute();
             await Test.Arguments();
             await Test.Shebang();
             await Test.Scriban();
