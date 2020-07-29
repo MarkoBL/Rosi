@@ -14,7 +14,7 @@ namespace Rosi.Scriban
         const string _initScript = @"
 {{-
 func setfilename
- Result.filepath = $0
+ Result.filename = $0
 end
 
 func setvalid

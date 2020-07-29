@@ -389,6 +389,10 @@ The name or path of the log file, default is log.txt.
 
 Appends the log output to the current log file, otherwise the log file will be overwritten every run. Default is false.
 
+**runtime.logscript**
+
+Show the actual script in the log ouput, if the compilation fails.
+
 **scriban.path**
 
 Sets a separate directory for scriban templates, default is the location of the main script.
