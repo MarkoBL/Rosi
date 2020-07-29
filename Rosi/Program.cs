@@ -78,7 +78,7 @@ namespace Rosi
                     PrintVersion();
                     return 0;
                 }
-                else if (arg == "--rosiruntimeverions")
+                else if (arg == "--rosiruntimeversions")
                 {
                     PrintRuntimeVersions();
                     return 0;

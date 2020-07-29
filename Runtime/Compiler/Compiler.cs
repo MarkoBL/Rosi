@@ -99,7 +99,7 @@ namespace Rosi.Compiler
             foreach (var file in parsedScript.CompileFiles)
             {
                 var (fileInfo, error) = parsedScript.GetScriptFileInfo(file);
-                if (!fileInfo.Exists)
+                if (fileInfo == null || !fileInfo.Exists)
                 {
                     result.SetError(CompilerResultType.ParserError, error);
                     return false;
@@ -136,6 +136,10 @@ namespace Rosi.Compiler
             catch(Exception ex)
             {
                 var error = Tr.Get("Compiler.Error", name, ex.Message);
+
+                if (_runtime.Config.LogScript)
+                    error += script + "\n";
+
                 Log.Error(error, this);
 
                 result.SetError(CompilerResultType.CompileError, error);

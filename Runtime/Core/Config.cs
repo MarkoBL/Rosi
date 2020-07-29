@@ -12,6 +12,7 @@ namespace Rosi.Core
         public bool LogAppend => Get("runtime.logfileappend", false);
         public bool LogToFile => Get("runtime.logtofile", false);
         public bool LogToConsole => Get("runtime.logtoconsole", true);
+        public bool LogScript => Get("runtime.logscript", false);
 
         public string TranslationPath => Get("runtime.translationpath", ".");
 
