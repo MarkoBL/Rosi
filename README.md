@@ -158,7 +158,7 @@ Hello World!
 ### Shebang
 *(Linux/macOS)* **Rosi** scripts have shebang support. But a shebang is invalid C# code and would break debugging. 
 Therefore, we use a workaround for debugging scripts. We create two files, a `script.rosi` and a `script.cs` file.
-The script `script.rosi` contains only the shebang and other directives and includes `script.cs`. See the [Shebang Exmaple](Tests/Shebang).
+The script `script.rosi` contains only the shebang and other directives and includes `script.cs`. See the [Shebang Example](Tests/Shebang).
 
 `script.rosi`
 ```Csharp
@@ -362,7 +362,7 @@ Hello Argument!
 
 Internal options for the *Rosi.Runtime*. You can set the options via the **set/debugset** directive or as a argument when running a script.
 
-**runtime.scriptath**
+**runtime.scriptpath**
 
 Sets a separate directory for the scripts, default is the location of the main script.
 
