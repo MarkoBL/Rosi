@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Rosi" Language="1033" Version="1.0.0.0" Manufacturer="MarkoBL" UpgradeCode="c4a3f540-b88f-4897-bc06-186cdc6e890c">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Rosi" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+
+		<UI Id="UserInterface">
+			<Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+			<Property Id="WixUI_Mode" Value="Custom" />
+
+			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+			<TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+
+			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+			<DialogRef Id="ProgressDlg" />
+			<DialogRef Id="ErrorDlg" />
+			<DialogRef Id="FilesInUse" />
+			<DialogRef Id="FatalError" />
+			<DialogRef Id="UserExit" />
+
+			<Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+
+		</UI>
+		<UIRef Id="WixUI_Common" />
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="Rosi" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<Icon Id="icon.ico" SourceFile="..\Rosi\icon.ico" />
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+		<Property Id="ARPURLINFOABOUT" Value="https://github.com/MarkoBL/Rosi" />
+		<Property Id="ARPNOMODIFY">1</Property>
+		<Property Id="ARPNOREPAIR">1</Property>
+
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="SetEnvironment" Guid="d62abf1c-1df4-4591-9a0d-57ae33cf680d">
+				<CreateFolder />
+				<Environment Id="PATH" Name="PATH" Value="[INSTALLFOLDER]" Permanent="yes" Part="last" Action="set" System="yes" />
+			</Component>
+			<Component>
+				<File Source="..\single\Rosi.exe" />
+
+				<!-- Rosi.Document ProgID -->
+				<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\Rosi.Document" Name="Rosi" Value="Rosi" Type="string" />
+				<ProgId Id="Rosi.Document" Description="Rosi">
+					<Extension Id="rosi" ContentType="application/rosi">
+						<Verb Id="open" Command="open" TargetFile="Rosi.exe" Argument="&quot;%1&quot;" />
+						<MIME ContentType="application/rosi" Default="yes" />
+					</Extension>
+				</ProgId>
+				
+				<!-- Add an 'Run with Rosi' to 'right click' even when not associated -->
+				<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.rosi\shell\edit.Rosi.exe" Value="Run with Rosi" Type="string" />
+				<RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.rosi\shell\edit.Rosi.exe\command" Value="&quot;[INSTALLFOLDER]Rosi.exe&quot; &quot;%1&quot;" Type="string" />
+
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

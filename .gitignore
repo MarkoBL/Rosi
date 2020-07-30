@@ -6,4 +6,8 @@ obj/
 *.user
 single/
 multi/
+wix/
+wixobj/
+*.wixpdb
 *.zip
+*.msi
