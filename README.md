@@ -4,7 +4,7 @@
 
 # Rosi
 
-**The power of the .NET Core Framework in a single executable**
+**The power of .NET Core in a single executable**
 
 **Rosi** is an easy way to run your C# code everywhere, especially on Linux and macOS. No need to mess around with package management. **Rosi** is just a single executable file that you need to run your C# code. Just put it on your USB drive and you're done.
 
