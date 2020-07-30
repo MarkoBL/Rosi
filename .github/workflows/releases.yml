@@ -198,7 +198,20 @@ jobs:
 
     - name: Zip Multi
       run: cd multi && del *.pdb && tar -a -cf ../multi.zip *.*
+
+    - name: Build Msi Installer
+      run: cd WindowsSetup && build.bat
       
+    - name: Upload Msi Installer
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.createrelease.outputs.releaseuploadurl }} 
+        asset_path: ./WindowsSetup/Rosi.msi
+        asset_name: Rosi_Windows_x64.msi
+        asset_content_type: application/octet-stream
+        
     - name: Upload Single Zip
       uses: actions/upload-release-asset@v1
       env:
