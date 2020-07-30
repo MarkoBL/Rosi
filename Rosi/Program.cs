@@ -36,7 +36,7 @@ namespace Rosi
             PrintRuntimeVersions();
         }
 
-        static async Task<int> CheckUpdate()
+        static async Task<int> CheckUpdate(bool silent)
         {
             try
             {
@@ -52,11 +52,12 @@ namespace Rosi
                 if (latestVersion > version)
                 {
 
-                    Log.Warn($"New Rosi version available: {latestVersion}. Installed version: {version.ToString(3)}.");
+                    Log.Warn($"New Rosi version available: {latestVersion}. Installed version: {version.ToString(3)}.\nDownload: {latestRelease.DownloadUrl}");
                     return 1;
                 }
 
-                Log.Info("No new version available. Latest Rosi version installed.");
+                if(!silent)
+                    Log.Info("No new version available. Latest Rosi version installed.");
                 return 0;
 
             }
@@ -86,11 +87,12 @@ namespace Rosi
                 else if (arg == "--rosimacoswelcome")
                 {
                     PrintMacOsWelcome();
+                    await CheckUpdate(true);
                     return 0;
                 }
                 else if (arg == "--rosicheckupdate")
                 {
-                    return await CheckUpdate();
+                    return await CheckUpdate(false);
                 }
             }
 
