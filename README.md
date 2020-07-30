@@ -1,10 +1,14 @@
+# Rosi
+
+Join the **Rosi** community chat for questions and support! 
+
+[![Discord](https://img.shields.io/discord/738411862693249104)](https://discord.gg/zA6tKG)
+
+**The power of .NET Core in a single executable**
+
 [![Releases](https://github.com/MarkoBL/Rosi/workflows/Releases/badge.svg)](https://github.com/MarkoBL/Rosi/releases)
 [![Nuget](https://img.shields.io/nuget/v/Rosi.Runtime)](https://www.nuget.org/packages/Rosi.Runtime/)
 [![Unit Tests](https://github.com/MarkoBL/Rosi/workflows/Unit%20Tests/badge.svg)](https://github.com/MarkoBL/Rosi/actions)
-
-# Rosi
-
-**The power of .NET Core in a single executable**
 
 **Rosi** is an easy way to run your C# code everywhere, especially on Linux and macOS. No need to mess around with package management. **Rosi** is just a single executable file that you need to run your C# code. Just put it on your USB drive and you're done.
 
