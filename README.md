@@ -1,9 +1,5 @@
 # Rosi
 
-Join the **Rosi** community chat for questions and support! 
-
-[![Discord](https://img.shields.io/discord/738411862693249104)](https://discord.gg/zA6tKG)
-
 **The power of .NET Core in a single executable**
 
 [![Releases](https://github.com/MarkoBL/Rosi/workflows/Releases/badge.svg)](https://github.com/MarkoBL/Rosi/releases)
