@@ -313,7 +313,7 @@ class B : IRosi
 }
 ```
 
-> A side note: Once we had a large script of entity definitions (a few thousand lines), with a lot of circling references (entity A was referencing entity B and vice versa). Therefore, we couldn't break them down into different assemblies. This wasn't a big problem at all for us, as all this code didn't contain much logic. But it was a huge problem for Visual Studio, as it wasn't able to process the script in a reasonalbe time. Sometimes it took a few secondes before it accepted a key strokes or updated intellisense. After a while (and lots of swearing), we decided to implement the *include* directive. We put all the entities in separate script files and added an empty script that simply includes all of them. Problem solved.
+> A side note: Once we had a large script of entity definitions (a few thousand lines), with a lot of circling references (entity A was referencing entity B and vice versa). Therefore, we couldn't break them down into different assemblies. This wasn't a big problem at all for us, as all this code didn't contain much logic. But it was a huge problem for Visual Studio, as it wasn't able to process the script in a reasonable time. Sometimes it took a few secondes before it accepted a key strokes or updated intellisense. After a while (and lots of swearing), we decided to implement the *include* directive. We put all the entities in separate script files and added an empty script that simply includes all of them. Problem solved.
 
 **// assembly:**
 
