@@ -5,7 +5,7 @@
   - Installs Rosi into "C:\Program Files\Rosi\"
   - Adds the directory to the system PATH environment variable and makes rosi.exe available in the terminal
   - Adds the .rosi file association
-
+- Updated Dependencies
 
 ## 1.0.2
 - Added new Test "Execute", which generates a new SSH key via 'ssh-keygen' 
