@@ -23,7 +23,7 @@ func setvalid
 
  Result.valid = $valid
  if !$valid && $error
-  Result.error = $rror
+  Result.error = $error
  end
 end
 

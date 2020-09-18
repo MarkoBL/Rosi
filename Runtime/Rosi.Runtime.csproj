@@ -16,7 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CS-Script.Core" Version="1.4.0" />
-    <PackageReference Include="IPNetwork2" Version="2.5.224" />
+    <PackageReference Include="IPNetwork2" Version="2.5.226" />
     <PackageReference Include="Scriban" Version="2.1.4" />
   </ItemGroup>
   <ItemGroup>
