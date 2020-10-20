@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+- Added wildcard includes #1
+- Improved assembly cache behaviour
+- Added option to output the generated scripts #6
+- Added YamlDotNet https://github.com/aaubry/YamlDotNet
+
 ## 1.0.3
 - Added Windows msi installer.
   - Installs Rosi into "C:\Program Files\Rosi\"

@@ -19,6 +19,7 @@ namespace Rosi.Core
         public bool CacheAssemblies => Get("runtime.usecachedassemblies", true);
         public string ScriptPath => Get("runtime.scriptpath", ".");
         public string AssemblyPath => Get("runtime.assemblypath", ".");
+        public string ScriptOutputPath => Get("runtime.scriptoutputpath", "");
         public string ScriptNamespace => Get("runtime.scriptnamespace", "Script");
         public string ScribanScriptPath => Get("scriban.path", ".");
 

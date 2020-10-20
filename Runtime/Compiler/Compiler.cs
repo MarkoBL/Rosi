@@ -122,16 +122,48 @@ namespace Rosi.Compiler
             scriptBuilder.AppendLine(parsedScript.Script);
 
             var script = scriptBuilder.ToString();
-            var useCachedAssemblies = _runtime.Config.CacheAssemblies;
+            if (string.IsNullOrWhiteSpace(script))
+            {
+                var error = Tr.Get("Compiler.ScriptEmpty", name);
+                Log.Error(error, this);
+                result.SetError(CompilerResultType.CompileError, error);
+                return false;
+            }
 
-            var tempFile = Path.Combine(Path.GetTempPath(), $"{Sha1.Compute(_runtime.RootPath.FullName).Replace("-", "").Substring(0, 8)}.{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "").Substring(0, 8) : "showtime")}.{rootClass}.dll");
+
+            var useCachedAssemblies = _runtime.Config.CacheAssemblies;
+            var filename = $"{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "") : "rosi")}.{rootClass}.dll";
+            var tempFile = Path.Combine(Path.GetTempPath(), filename);
+
+            var loaded = false;
+            if(useCachedAssemblies && File.Exists(tempFile))
+            {
+                try
+                {
+                    Evaluator.ReferenceAssembly(tempFile);
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach(var ass in assemblies)
+                    {
+                        if(ass.EscapedCodeBase.Contains(filename))
+                        {
+                            result.Assemby = ass;
+                            loaded = true;
+                            break;
+                        }
+                    }
+                }
+                catch { }
+            }
 
             try
             {
-                var assembly = Evaluator.CompileCode(scriptBuilder.ToString(), new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = tempFile });
-                result.Assemby = assembly;
+                if (!loaded)
+                {
+                    var assembly = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = tempFile });
+                    result.Assemby = assembly;
 
-                Evaluator.ReferenceAssembly(assembly);
+                    Evaluator.ReferenceAssembly(assembly);
+                }
             }
             catch(Exception ex)
             {
@@ -144,6 +176,18 @@ namespace Rosi.Compiler
 
                 result.SetError(CompilerResultType.CompileError, error);
                 return false;
+            }
+
+            var outputPath = _runtime.Config.ScriptOutputPath;
+            if(!string.IsNullOrWhiteSpace(outputPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(outputPath);
+                    await File.WriteAllTextAsync(Path.Combine(outputPath, name), script);
+                }
+                catch
+                { }
             }
 
             foreach (var file in parsedScript.PostCompileFiles)

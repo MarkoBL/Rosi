@@ -77,10 +77,40 @@ namespace Rosi.Compiler
             return false;
         }
 
+        List<FileInfo> GetFiles(string path, bool sub)
+        {
+            var result = new List<FileInfo>();
+
+            var dir = new DirectoryInfo(path);
+
+            if (sub)
+            {
+                var subDirs = dir.GetDirectories();
+                foreach(var subDir in subDirs)
+                {
+                    result.AddRange(GetFiles(Path.Combine(path, subDir.Name), sub));
+                }
+            }
+
+            var files = dir.GetFiles("*.rosi");
+            foreach (var file in files)
+            {
+                result.Add(file);
+            }
+
+            files = dir.GetFiles("*.cs");
+            foreach (var file in files)
+            {
+                result.Add(file);
+            }
+
+            return result;
+        }
+
         bool ParseScript(string name, string content)
         {
-            var header = new StringBuilder($"// {name} Header\n\n");
-            var body = new StringBuilder($"// {name} Body\n\n");
+            var header = new StringBuilder($"\n// {name}\n");
+            var body = new StringBuilder($"\n\n// {name}\n");
 
             var includes = new List<string>();
 
@@ -126,15 +156,33 @@ namespace Rosi.Compiler
                     var scriptFiles = line.Substring(12).Split(',', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var scriptFile in scriptFiles)
                     {
-                        if (name == scriptFile)
+                        if (scriptFile.EndsWith("*"))
                         {
-                            Error = Tr.Get("ScriptParser.CyclingInclude", name, scriptFile);
-                            Log.Error(Error);
-                            Result = ScriptParserResult.CyclingInclude;
+                            var files = GetFiles(_runtime.Config.ScriptPath, scriptFile.EndsWith("**"));
+                            var scriptPath = new DirectoryInfo(Path.Combine(_runtime.Config.ScriptPath)).FullName;
 
-                            return false;
+                            foreach (var file in files)
+                            {
+                                var path = file.FullName.Replace(scriptPath, "");
+
+                                if (path == name)
+                                    continue;
+
+                                includes.Add(path);
+                            }
                         }
-                        includes.Add(scriptFile.Trim());
+                        else
+                        {
+                            if (name == scriptFile)
+                            {
+                                Error = Tr.Get("ScriptParser.CyclingInclude", name, scriptFile);
+                                Log.Error(Error);
+                                Result = ScriptParserResult.CyclingInclude;
+
+                                return false;
+                            }
+                            includes.Add(scriptFile.Trim());
+                        }
                     }
                     continue;
                 }
@@ -220,7 +268,8 @@ namespace Rosi.Compiler
             {
                 if (!_includes.Add(include))
                 {
-                    Log.Warn(Tr.Get("ScriptParser.AlreadyIncluded", name, include), this);
+                    Log.Error(Tr.Get("ScriptParser.AlreadyIncluded", name, include), this);
+                    return false;
                 }
 
                 var (fileinfo, error) = GetScriptFileInfo(include);
