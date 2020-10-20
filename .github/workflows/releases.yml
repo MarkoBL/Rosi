@@ -191,16 +191,16 @@ jobs:
       run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
 
     - name: Zip Single
-      run: cd single && del *.pdb && tar -a -cf ..\single.zip *.*
+      run: cd single; del *.pdb; tar -a -cf ..\single.zip *.*
       
     - name: Build Multi
       run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
 
     - name: Zip Multi
-      run: cd multi && del *.pdb && tar -a -cf ../multi.zip *.*
+      run: cd multi; del *.pdb; tar -a -cf ../multi.zip *.*
 
     - name: Build Msi Installer
-      run: cd WindowsSetup && build.bat
+      run: cd WindowsSetup; .\build.bat
       
     - name: Upload Msi Installer
       uses: actions/upload-release-asset@v1
