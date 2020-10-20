@@ -233,9 +233,9 @@ class Script : IRosi
         return 0;
     }
 
-    static async System.Threading.Tasks.Task<int> Main()
+    static async System.Threading.Tasks.Task<int> Main(string[] args)
     {
-        return await new Rosi.Runtime(typeof(Script)).RunAsync();
+        return await new Rosi.Runtime(typeof(Script), args).RunAsync();
     }
 }
 ```
