@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/MarkoBL/Rosi</PackageProjectUrl>
     <Title>Rosi Runtime</Title>
     <PackageId>Rosi.Runtime</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Marko B. Ludolph</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/MarkoBL/Rosi</RepositoryUrl>

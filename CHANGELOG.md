@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.0.5
+
 ## 1.0.4
 - Added wildcard includes #1
 - Improved assembly cache behaviour
