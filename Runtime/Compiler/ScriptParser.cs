@@ -158,8 +158,11 @@ namespace Rosi.Compiler
                     {
                         if (scriptFile.EndsWith("*"))
                         {
-                            var files = GetFiles(_runtime.Config.ScriptPath, scriptFile.EndsWith("**"));
-                            var scriptPath = new DirectoryInfo(Path.Combine(_runtime.Config.ScriptPath)).FullName;
+                            var p = Path.Combine(_runtime.Config.ScriptPath, scriptFile.Replace("*", ""));
+                            var files = GetFiles(p, scriptFile.EndsWith("**"));
+                            var scriptPath = new DirectoryInfo(_runtime.Config.ScriptPath).FullName;
+                            if (!scriptPath.EndsWith(Path.DirectorySeparatorChar))
+                                scriptPath += Path.DirectorySeparatorChar;
 
                             foreach (var file in files)
                             {

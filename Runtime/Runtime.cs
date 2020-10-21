@@ -170,7 +170,6 @@ namespace Rosi
             return false;
         }
 
-
         void IRuntime.SetValue(string name, object value)
         {
             SetValue(name, value);

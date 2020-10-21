@@ -1,6 +1,8 @@
 # Changelog
 
 ## 1.0.5
+- Fixed wildcard includes when using a path
+- Fixed generated script output
 
 ## 1.0.4
 - Added wildcard includes #1

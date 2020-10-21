@@ -130,6 +130,17 @@ namespace Rosi.Compiler
                 return false;
             }
 
+            var outputPath = _runtime.Config.ScriptOutputPath;
+            if (!string.IsNullOrWhiteSpace(outputPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(outputPath);
+                    await File.WriteAllTextAsync(Path.Combine(outputPath, name), script);
+                }
+                catch
+                { }
+            }
 
             var useCachedAssemblies = _runtime.Config.CacheAssemblies;
             var filename = $"{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "") : "rosi")}.{rootClass}.dll";
@@ -176,18 +187,6 @@ namespace Rosi.Compiler
 
                 result.SetError(CompilerResultType.CompileError, error);
                 return false;
-            }
-
-            var outputPath = _runtime.Config.ScriptOutputPath;
-            if(!string.IsNullOrWhiteSpace(outputPath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(outputPath);
-                    await File.WriteAllTextAsync(Path.Combine(outputPath, name), script);
-                }
-                catch
-                { }
             }
 
             foreach (var file in parsedScript.PostCompileFiles)
