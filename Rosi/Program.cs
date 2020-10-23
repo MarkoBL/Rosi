@@ -70,8 +70,6 @@ namespace Rosi
 
         static async Task<int> Main(string[] args)
         {
-            Console.Title = "Rosi";
-
             foreach (var arg in args)
             {
                 if (arg == "--rosiversion")
@@ -96,7 +94,10 @@ namespace Rosi
                 }
             }
 
+
             var runtime = new Runtime(null, args);
+
+            Console.Title = runtime.Config.Get("rosi.title", "Rosi");
             var result = await runtime.RunAsync();
 
             if (runtime.Config.Get("rosi.waitforexit", false))

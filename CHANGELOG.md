@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.6
+- Added "rosi.title" option to set the title of the console window
+
 ## 1.0.5
 - Fixed wildcard includes when using a path
 - Fixed generated script output
