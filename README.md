@@ -118,13 +118,27 @@ Make it available for every user through the terminal by putting it into `/usr/l
 
 *App*
 
-Download the latest [Rosi macOS App](https://github.com/MarkoBL/Rosi/releases/latest/download/Rosi_MacOs_App_x64.zip), unzip it and move it to the Applications folder. All `.rosi`files will open in the macOS App, when you double click them. To make **Rosi** available through the terminal, put a symlink into /usr/local/bin.
+Download the latest [Rosi macOS App](https://github.com/MarkoBL/Rosi/releases/latest/download/Rosi_MacOs_App_x64.zip), unzip it and move it to the Applications folder. All `.rosi`files will open in the macOS App, when you double click them. To make **Rosi** available through the terminal, put a symlink into `/usr/local/bin`.
 
 ```
 > ln -s /Applications/Rosi.app/Contents/Resources/rosi.bundle/rosi /usr/local/bin/rosi
 ```
 
 ### Windows
+
+*Terminal*
+
+Rosi is available via [winget](https://docs.microsoft.com/en-us/windows/package-manager/winget/):
+
+```
+> winget install rosi
+```
+
+*Installer*
+
+Download the latest [Rosi Windows Installer](https://github.com/MarkoBL/Rosi/releases/latest/download/Rosi_Windows_x64.msi) and run it. It installs Rosi into `C:\Windows\Rosi`, adds this path to the PATH environment variable and associates the `.rosi` file extension with the `rosi.exe`.
+
+*Manual*
 
 Download the latest [Rosi Windows Version](https://github.com/MarkoBL/Rosi/releases/latest/download/Rosi_Windows_x64.zip) and unzip it. 
 You will have the `rosi.exe` in the current directory. Move the `rosi.exe` to a location of your choice and [add to your PATH environment variable](https://medium.com/@kevinmarkvi/how-to-add-executables-to-your-path-in-windows-5ffa4ce61a53) to access it from the command line.
