@@ -41,6 +41,10 @@ namespace Rosi
 
         static Runtime()
         {
+            // force assembly inclusion
+            typeof(YamlDotNet.Core.Events.MappingStart).GetType();
+            typeof(System.Net.IPNetwork).GetType();
+
             Tr.Init(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         }
 

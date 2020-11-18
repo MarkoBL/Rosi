@@ -2,6 +2,9 @@
 
 ## 1.0.6
 - Added "rosi.title" option to set the title of the console window
+- Force inclusion of supplied assemblies (IPNetwork2, YamlDotNet)
+- Updated Scriban
+- Updated IPNetwork2
 
 ## 1.0.5
 - Fixed wildcard includes when using a path
