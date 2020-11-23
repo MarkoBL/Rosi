@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7
+- Added Newtonsoft.Json
+- Downgraded Scriban
+
 ## 1.0.6
 - Added "rosi.title" option to set the title of the console window
 - Force inclusion of supplied assemblies (IPNetwork2, YamlDotNet)
