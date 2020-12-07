@@ -36,8 +36,9 @@ end
         readonly DirectoryInfo _scribanPath;
 
         readonly ScriptObject _globals = new ScriptObject();
+        readonly bool _forceLinefeed;
 
-        public ScribanRuntime(DirectoryInfo scribanPath)
+        public ScribanRuntime(DirectoryInfo scribanPath, bool forceLineFeed = true)
         {
             _scribanPath = scribanPath;
 
@@ -45,8 +46,11 @@ end
             {
                 TemplateLoader = this,
                 MemberRenamer = (memeber) => memeber.Name,
-                NewLine = "\n"
             };
+
+            _forceLinefeed = forceLineFeed;
+            if (_forceLinefeed)
+                _context.NewLine = "\n";
 
             _context.PushGlobal(_globals);
             Parse(_initScript);
@@ -95,7 +99,7 @@ end
         public ScribanResult Parse(string template)
         {
             var parsed = Template.Parse(template);
-
+            
             var result = new ScriptObject
             {
                 { "error", null },
@@ -120,6 +124,9 @@ end
             try
             {
                 var output = parsed.Render(_context);
+                if(!string.IsNullOrEmpty(output) && _forceLinefeed && output.IndexOf('\r') >= 0)
+                    output = output.Replace("\r\n", "\n"); ;
+
                 var r = new ScribanResult((string)result["error"], output, result);
 
                 if (r.HasError)
