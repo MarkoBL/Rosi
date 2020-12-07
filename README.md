@@ -348,7 +348,7 @@ class Json : IRosi
 
 **// set, setlinux, setmacos, setwindows or debugset:**
 
-Sets internal or custom options. *setlinux*, *setmacos*, *setwindows* will set this option only on the matching os. It is also possible to specify options via arguments. *Debugset* works only while debugging a script, otherwise it is ignored.
+Sets internal or custom options. *Setlinux*, *setmacos*, *setwindows* will set this option only on the matching os. It is also possible to specify options via arguments. *Debugset* works only while debugging a script, otherwise it is ignored.
 
 `A.cs`
 ```Csharp
