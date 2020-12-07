@@ -45,6 +45,7 @@ end
             {
                 TemplateLoader = this,
                 MemberRenamer = (memeber) => memeber.Name,
+                NewLine = "\n"
             };
 
             _context.PushGlobal(_globals);
