@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Rosi.Compiler;
 using Rosi.Core;
@@ -25,6 +26,10 @@ namespace Rosi
         public DirectoryInfo RootPath { get; private set; }
         public Config Config { get; private set; }
         public Compiler.Compiler Compiler { get; private set; }
+
+        internal bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        internal bool IsMacOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        internal bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         public bool Debugging => Debugger.IsAttached && _debugMainType != null;
 

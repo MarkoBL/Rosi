@@ -45,10 +45,52 @@ namespace Rosi.Compiler
 
         static bool ParseOptions(string line, Runtime runtime)
         {
+            if (string.IsNullOrWhiteSpace(line) || line[0] != '/')
+                return false;
+
             var config = runtime.Config;
             if (line.StartsWith("// set:", StringComparison.Ordinal))
             {
                 var option = line.Substring(8).Trim();
+                var idx = option.IndexOf(' ');
+                if (idx > 0)
+                {
+                    var key = option.Substring(0, idx).Trim();
+                    var value = option.Substring(idx).Trim();
+
+                    config[key] = value;
+                }
+                return true;
+            }
+            else if (runtime.IsWindows && line.StartsWith("// setwindows:", StringComparison.Ordinal))
+            {
+                var option = line.Substring(15).Trim();
+                var idx = option.IndexOf(' ');
+                if (idx > 0)
+                {
+                    var key = option.Substring(0, idx).Trim();
+                    var value = option.Substring(idx).Trim();
+
+                    config[key] = value;
+                }
+                return true;
+            }
+            else if (runtime.IsLinux && line.StartsWith("// setlinux:", StringComparison.Ordinal))
+            {
+                var option = line.Substring(13).Trim();
+                var idx = option.IndexOf(' ');
+                if (idx > 0)
+                {
+                    var key = option.Substring(0, idx).Trim();
+                    var value = option.Substring(idx).Trim();
+
+                    config[key] = value;
+                }
+                return true;
+            }
+            else if (runtime.IsMacOs && line.StartsWith("// setmacos:", StringComparison.Ordinal))
+            {
+                var option = line.Substring(13).Trim();
                 var idx = option.IndexOf(' ');
                 if (idx > 0)
                 {

@@ -346,13 +346,14 @@ class Json : IRosi
 }
 ```
 
-**// set or debugset:**
+**// set, setlinux, setmacos, setwindows or debugset:**
 
-Sets internal or custom options. It is also possible to specify options via arguments. *Debugset* works only while debugging a script, otherwise it is ignored.
+Sets internal or custom options. *setlinux*, *setmacos*, *setwindows* will set this option only on the matching os. It is also possible to specify options via arguments. *Debugset* works only while debugging a script, otherwise it is ignored.
 
 `A.cs`
 ```Csharp
 // set: config.test Hello Config!
+// setlinux: config.test Hello Config From Linux!
 // set: argument.test Will be overriden by the command argument
 // setdebug: runtime.logtofile 1
 class A : IRosi
@@ -369,6 +370,13 @@ class A : IRosi
 ```
 > rosi A.cs -argument.test "Hello Argument!"
 Hello Config!
+Hello Argument!
+```
+
+On Linux the script would output:
+```
+> rosi A.cs -argument.test "Hello Argument!"
+Hello Config From Linux!
 Hello Argument!
 ```
 
