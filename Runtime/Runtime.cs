@@ -103,6 +103,16 @@ namespace Rosi
             if (Config.LogToFile && Log.SetLogFile(new FileInfo(Config.LogFilename), Config.LogAppend))
                 Log.ShowConsoleOutput = Config.LogToConsole;
 
+            if (Enum.TryParse(Config.ConsoleLogLevel, true, out LogLevels logLevel))
+                Log.ConsoleLogLevel = logLevel;
+            else
+                Log.Warn(Tr.Get("Runtime.UnknownLogLevel", Config.ConsoleLogLevel));
+
+            if (Enum.TryParse(Config.FileLogLevel, true, out logLevel))
+                Log.FileLogLevel = logLevel;
+            else
+                Log.Warn(Tr.Get("Runtime.UnknownLogLevel", Config.FileLogLevel));
+
             Tr.LoadFiles(new DirectoryInfo(Config.TranslationPath));
             Compiler = new Compiler.Compiler(this);
         }

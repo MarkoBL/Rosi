@@ -8,11 +8,12 @@ namespace Rosi.Core
 {
     public static class Log
     {
-        public static LogLevels LogLevel = LogLevels.Trace;
+        public static LogLevels ConsoleLogLevel = LogLevels.Trace;
+        public static LogLevels FileLogLevel = LogLevels.Warning;
 
-        public static bool LogTrace => LogLevel <= LogLevels.Trace; // Can be used to avoid costly string operations
-        public static bool LogDebug => LogLevel <= LogLevels.Debug;
-        public static bool LogInfo => LogLevel <= LogLevels.Info;
+        public static bool LogTrace => ConsoleLogLevel <= LogLevels.Trace; // Can be used to avoid costly string operations
+        public static bool LogDebug => ConsoleLogLevel <= LogLevels.Debug;
+        public static bool LogInfo => ConsoleLogLevel <= LogLevels.Info;
 
         public static bool ShowConsoleOutput = true;
         public static bool ConsoleExtendedMessage = false;
@@ -39,7 +40,7 @@ namespace Rosi.Core
         {
             try
             {
-                _logStream = new StreamWriter(filepath.OpenWrite())
+                _logStream = new StreamWriter(filepath.Open(FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
                 {
                     AutoFlush = true
                 };
@@ -72,7 +73,7 @@ namespace Rosi.Core
 
         static void Output(LogLevels logLevel, string output, string originalMessage)
         {
-            if (ShowConsoleOutput)
+            if (logLevel >= ConsoleLogLevel && ShowConsoleOutput)
             {
                 Console.ResetColor();
                 if (logLevel >= LogLevels.Warning)
@@ -86,14 +87,15 @@ namespace Rosi.Core
 
             try
             {
-                _logStream?.WriteLine(output);
+                if(logLevel >= FileLogLevel)
+                    _logStream?.WriteLine(output);
             }
             catch { }
         }
 
         static void LogEvent(LogLevels logLevel, string message, ILogger logger, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            if (logLevel >= LogLevel)
+            if (logLevel >= ConsoleLogLevel || logLevel >= FileLogLevel)
             {
                 var name = string.Empty;
                 if (logger != null)

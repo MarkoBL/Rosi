@@ -9,11 +9,12 @@ namespace Rosi.Core
         readonly ArgumentsParser _argumentsParser;
 
         public string LogFilename => Get("runtime.logfilename", "log.txt");
-        public bool LogAppend => Get("runtime.logfileappend", false);
+        public bool LogAppend => Get("runtime.logfileappend", true);
         public bool LogToFile => Get("runtime.logtofile", false);
         public bool LogToConsole => Get("runtime.logtoconsole", true);
+        public string ConsoleLogLevel => Get("runtime.consoleloglevel", LogLevels.Info.ToString());
+        public string FileLogLevel => Get("runtime.fileloglevel", LogLevels.Warning.ToString());
         public bool LogScript => Get("runtime.logscript", false);
-
         public string TranslationPath => Get("runtime.translationpath", ".");
 
         public bool CacheAssemblies => Get("runtime.usecachedassemblies", true);

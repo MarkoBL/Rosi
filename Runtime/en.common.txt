@@ -11,3 +11,4 @@ Runtime.RuntimeError: Executing runtime failed: {0}
 Runtime.MainScriptMissing: Script not found: '{0}'
 Runtime.NoArgs: Usage: rosi /path/to/script
 Runtime.DebugNoMainScript: Main script not set or found during debugging. The working directory is not set to the script root directory and config options are not parsed.
+Runtime.UnknownLogLevel: {0} is an invalid log level. Use Trace, Debug, Info, Warning, Error or Fatal.

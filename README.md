@@ -256,45 +256,14 @@ class Script : IRosi
 
 ## Directives
 
-**// compile:**
-
-The compile directive compiles a script into an assembly. 
-The *Rosi.Runtime* will automatically reference and include the compiled assembliy. 
-The compiling happens before the actual script that contains the directive will be compiled.
-If it can't find the specified file, it will add the `.rosi` extension and will try it again. If this fails too, it will add the `.cs` file extension. If all tries fail, the runtime will exit.
-
-`A.cs`
-```Csharp
-class A
-{
-    public int Compiled()
-    {
-        return 0;
-    }
-}
-```
-
-`B.cs`
-```Csharp
-// compile: A // this will actually resolve to A.cs
-class B : IRosi
-{
-    public int Run(IRuntime runtime)
-    {
-        return new A().Compiled();
-    }
-}
-```
-
-**// postcompile:**
-
-This acts like the compile directive, but the script will be compiled into an assembly, AFTER the script that contains it is compiled.
-
 **// include:**
 
 The include directive actually includes the content of the script file into the current script. 
-This is done by splitting the script into a header (using xy, etc.) and body (the actual code) part and insert it at the right locations in the current script.
-This is usefull, if you have cycling references in classes, but still want to split the classes into different files.
+This is done by splitting the script into a header and body part and insert it at the right locations in the current script.
+You can specify a wildcard to include all `.rosi` and `.cs`. Use `include *` to include all files in the current directory or
+`include **` to include all files in the current directory and all the subdirectories. You can also specify a directory to
+include files, e.g. `include Source/**`.
+
 
 ```Csharp
 class A
@@ -328,6 +297,43 @@ class B : IRosi
 ```
 
 > A side note: Once we had a large script of entity definitions (a few thousand lines), with a lot of circling references (entity A was referencing entity B and vice versa). Therefore, we couldn't break them down into different assemblies. This wasn't a big problem at all for us, as all this code didn't contain much logic. But it was a huge problem for Visual Studio, as it wasn't able to process the script in a reasonable time. Sometimes it took a few secondes before it accepted a key strokes or updated intellisense. After a while (and lots of swearing), we decided to implement the *include* directive. We put all the entities in separate script files and added an empty script that simply includes all of them. Problem solved.
+
+
+**// compile:**
+
+*You should usually use the include directive.*
+The compile directive compiles a script into an assembly. 
+The *Rosi.Runtime* will automatically reference and include the compiled assembliy. 
+The compiling happens before the actual script that contains the directive will be compiled.
+If it can't find the specified file, it will add the `.rosi` extension and will try it again. If this fails too, it will add the `.cs` file extension. If all tries fail, the runtime will exit.
+
+`A.cs`
+```Csharp
+class A
+{
+    public int Compiled()
+    {
+        return 0;
+    }
+}
+```
+
+`B.cs`
+```Csharp
+// compile: A // this will actually resolve to A.cs
+class B : IRosi
+{
+    public int Run(IRuntime runtime)
+    {
+        return new A().Compiled();
+    }
+}
+```
+
+**// postcompile:**
+
+*You should usually use the include directive.*
+This acts like the compile directive, but the script will be compiled into an assembly, AFTER the script that contains it is compiled.
 
 **// assembly:**
 
@@ -400,9 +406,17 @@ Compiled assemblies will be chached and resued every run, as long as they script
 
 Log output will be redirected to the console, default is true.
 
+**runtime.consoleloglevel**
+
+The log level for the console output. Valid values: Trace, Debug, Info, Warning, Error or Fatal. Default is Info.
+
 **runtime.logtofile**
 
 Log output will be redirected to a file, default is false
+
+**runtime.fileloglevel**
+
+The log level for the console output. Valid values: Trace, Debug, Info, Warning, Error or Fatal. Default is Warning.
 
 **runtime.logfilename**
 
@@ -410,7 +424,7 @@ The name or path of the log file, default is log.txt.
 
 **runtime.logfileappend**
 
-Appends the log output to the current log file, otherwise the log file will be overwritten every run. Default is false.
+Appends the log output to the current log file, otherwise the log file will be overwritten every run. Default is true.
 
 **runtime.logscript**
 

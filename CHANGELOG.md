@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9
+- No more exclusive file lock on the log file.
+- Added runtime.consoleloglevel and runtime.fileloglevel options
+
 ## 1.0.8
 - Added setlinux, setmacos, setwindows
 - Set Scriban default newline to "\n"
