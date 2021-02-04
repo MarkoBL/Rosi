@@ -19,9 +19,6 @@ namespace Rosi.Core
             else
                 _translation = new Translation(language);
 
-            if (!_translation.Valid)
-                _translation = _base;
-
             _base.LoadEmbedded();
             if (_base != _translation)
                 _translation?.LoadEmbedded();
