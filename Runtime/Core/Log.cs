@@ -71,9 +71,9 @@ namespace Rosi.Core
             }
         }
 
-        static void Output(LogLevels logLevel, string output, string originalMessage)
+        static void Output(LogLevels logLevel, string output, string originalMessage, bool forceConsoleOutput)
         {
-            if (logLevel >= ConsoleLogLevel && ShowConsoleOutput)
+            if (logLevel >= ConsoleLogLevel && ShowConsoleOutput || forceConsoleOutput)
             {
                 Console.ResetColor();
                 if (logLevel >= LogLevels.Warning)
@@ -87,7 +87,7 @@ namespace Rosi.Core
 
             try
             {
-                if(logLevel >= FileLogLevel)
+                if(logLevel >= FileLogLevel && !forceConsoleOutput)
                     _logStream?.WriteLine(output);
             }
             catch { }
@@ -113,7 +113,7 @@ namespace Rosi.Core
                 var sender = $"@{memberName}():{Path.GetFileName(sourceFilePath)}:{sourceLineNumber}";
                 var output = $"[{logLevel} {DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()}]{name} {message} ({sender})";
 
-                Output(logLevel, output, message);
+                Output(logLevel, output, message, false);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Rosi.Core
             }
 
             var output = $"[{DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()}]{name} {message}";
-            Output(LogLevels.Trace, output, message);
+            Output(LogLevels.Trace, output, message, true);
         }
 
         public static void Write(object message, ILogger logger = null)
