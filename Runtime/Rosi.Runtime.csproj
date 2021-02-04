@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="CS-Script.Core" Version="1.4.0" />
     <PackageReference Include="IPNetwork2" Version="2.5.240" />
-    <PackageReference Include="Scriban" Version="3.4.1" />
+    <PackageReference Include="Scriban" Version="3.4.2" />
     <PackageReference Include="YamlDotNet" Version="9.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>

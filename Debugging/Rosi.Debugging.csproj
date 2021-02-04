@@ -6,6 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Rosi.Runtime" Version="1.0.2" />
+    <PackageReference Include="Rosi.Runtime" Version="1.0.9" />
   </ItemGroup>
 </Project>
