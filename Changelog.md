@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.10
+- Translation file fix
+- Added VersionUpdate.rosi to automate version update in various files
+- Fixed a bug in Log.Write not writing to the console
+
 ## 1.0.9
 - No more exclusive file lock on the log file.
 - Added runtime.consoleloglevel and runtime.fileloglevel options
