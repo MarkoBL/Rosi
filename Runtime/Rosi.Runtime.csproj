@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/MarkoBL/Rosi</PackageProjectUrl>
     <Title>Rosi Runtime</Title>
     <PackageId>Rosi.Runtime</PackageId>
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
     <Authors>Marko B. Ludolph</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/MarkoBL/Rosi</RepositoryUrl>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,7 +10,7 @@
     <Authors>Marko B. Ludolph</Authors>
     <Copyright>Copyright Marko B. Ludolph</Copyright>
     <Product>Rosi</Product>
-    <Version>1.0.9.0</Version>
+    <Version>1.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>
