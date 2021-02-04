@@ -1,0 +1,63 @@
+﻿using Rosi.Core;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+class VersionUpdate : IAsyncRosi
+{
+    const string VersionFile = "Version.txt";
+
+    static async Task UpdateFile(string filePath, string startText, string endText, Version version, int versionFieldCount)
+    {
+        Log.Info($"Updating { filePath }.");
+
+        var fileContent = await File.ReadAllTextAsync(filePath);
+
+        var startPosition = fileContent.IndexOf(startText) + startText.Length;
+        var endPosition = fileContent.IndexOf(endText, startPosition);
+
+        fileContent = $"{ fileContent.Substring(0, startPosition) }{ version.ToString(versionFieldCount) }{ fileContent.Substring(endPosition) }";
+
+        await File.WriteAllTextAsync(filePath, fileContent);
+    }
+
+    public async Task<int> Run(IRuntime runtime)
+    {
+        if(File.Exists(VersionFile))
+        {
+            var versionText = await File.ReadAllTextAsync(VersionFile);
+            Log.Info($"Version in { VersionFile }: { versionText }");
+        }
+        else
+        {
+            Log.Warn($"{VersionFile} not found.");
+        }
+
+        Log.Write($"Please type the new version.");
+
+        var newVersionText = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(newVersionText))
+        {
+            Log.Write("Skipping new version.");
+            return 1;
+        }
+
+        // force all fields
+        var newVersion = new Version(newVersionText);
+        var major = Math.Max(0, newVersion.Major);
+        var minor = Math.Max(0, newVersion.Minor);
+        var build = Math.Max(0, newVersion.Build);
+        var revision = Math.Max(0, newVersion.Revision);
+        newVersion = new Version(major, minor, build, revision);
+
+        Log.Write($"New Version: {newVersion}.");
+
+        await UpdateFile("Runtime/Rosi.Runtime.csproj", "<Version>", "</Version>", newVersion, 3);
+        await UpdateFile("Rosi/Rosi.csproj", "<Version>", "</Version>", newVersion, 3);
+        await UpdateFile("WindowsSetup/Rosi.wxs", "Version=\"", "\"", newVersion, 4);
+
+        await File.WriteAllTextAsync(VersionFile, newVersion.ToString());
+
+        return 0;
+    }
+}
