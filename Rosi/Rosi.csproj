@@ -10,7 +10,7 @@
     <Authors>Marko B. Ludolph</Authors>
     <Copyright>Copyright Marko B. Ludolph</Copyright>
     <Product>Rosi</Product>
-    <Version>1.0.10</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
