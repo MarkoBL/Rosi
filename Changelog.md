@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0
+- Added support for custom translations
+
 ## 1.0.10
 - Translation file fix
 - Added VersionUpdate.rosi to automate version update in various files

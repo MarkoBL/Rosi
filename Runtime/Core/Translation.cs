@@ -21,14 +21,19 @@ namespace Rosi.Core
 
             _base.LoadEmbedded();
             if (_base != _translation)
-                _translation?.LoadEmbedded();
+                _translation.LoadEmbedded();
         }
 
         public static void LoadFiles(DirectoryInfo path)
         {
             _base?.LoadFiles(path);
             if (_base != _translation)
-                _translation?.LoadFiles(path);
+                _translation.LoadFiles(path);
+        }
+
+        public static void AddLines(IReadOnlyList<(string, string)> lines)
+        {
+            _translation.ProcessLines(lines);
         }
 
         public static bool Has(string key)
@@ -89,10 +94,9 @@ namespace Rosi.Core
                 Language = language;
             }
 
-            void ProcessLines(IList<string> lines)
+            void ProcessLines(IReadOnlyList<string> lines)
             {
-                var replaces = new List<KeyValuePair<string, string>>();
-
+                var replaces = new List<(string, string)>();
                 foreach (var line in lines)
                 {
                     var split = line.IndexOf(':');
@@ -103,17 +107,42 @@ namespace Rosi.Core
                         if (value.Length > 0)
                         {
                             if (value[0] == '.')
-                                replaces.Add(new KeyValuePair<string, string>(key, value.Substring(1)));
+                                replaces.Add((key, value.Substring(1)));
 
                             _items[key] = value;
                         }
                     }
                 }
 
+                UpdateReplaces(replaces);
+            }
+
+            public void ProcessLines(IReadOnlyList<(string, string)> lines)
+            {
+                var replaces = new List<(string, string)>();
+                foreach (var line in lines)
+                {
+                    var key = line.Item1;
+                    var value = line.Item2;
+
+                    if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+                        continue;
+
+                    if (value[0] == '.')
+                        replaces.Add((key, value.Substring(1)));
+
+                    _items[key] = value;
+                }
+
+                UpdateReplaces(replaces);
+            }
+
+            void UpdateReplaces(IReadOnlyList<(string, string)> replaces)
+            {
                 foreach (var replace in replaces)
                 {
-                    if (_items.TryGetValue(replace.Value, out var newValue))
-                        _items[replace.Key] = newValue;
+                    if (_items.TryGetValue(replace.Item2, out var newValue))
+                        _items[replace.Item1] = newValue;
                 }
             }
 
