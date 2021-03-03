@@ -117,6 +117,14 @@ namespace Rosi
             Compiler = new Compiler.Compiler(this);
         }
 
+        async ValueTask DisposeRosi(object rosi)
+        {
+            if (rosi is IDisposable disposable)
+                disposable.Dispose();
+            if (rosi is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
+        }
+
         public async Task<int> RunAsync()
         {
             if (Compiler == null)
@@ -127,18 +135,26 @@ namespace Rosi
                 if(Debugging)
                 {
                     var @class = Activator.CreateInstance(_debugMainType);
-                    if (@class is IAsyncRosi asyncMain)
-                        return await asyncMain.Run(this);
+                    if (@class is IAsyncRosi asyncRosi)
+                    {
+                        var result = await asyncRosi.Run(this);
+                        await DisposeRosi(asyncRosi);
+                        return result;
+                    }
                     else if (@class is IRosi rosi)
-                        return rosi.Run(this);
+                    {
+                        var result = rosi.Run(this);
+                        await DisposeRosi(rosi);
+                        return result;
+                    }
                 }
                 else
                 {
-                    var result = await Compiler.Compile(_mainScript.Name, File.ReadAllText(_mainScript.FullName));
-                    if (result.Result != CompilerResultType.Ok)
+                    var compilerResult = await Compiler.Compile(_mainScript.Name, File.ReadAllText(_mainScript.FullName));
+                    if (compilerResult.Result != CompilerResultType.Ok)
                         return -1;
 
-                    var assembly = result?.Assemby;
+                    var assembly = compilerResult?.Assemby;
                     if (assembly != null)
                     {
                         var types = assembly.GetTypes();
@@ -146,15 +162,23 @@ namespace Rosi
                         {
                             if (typeof(IAsyncRosi).IsAssignableFrom(type))
                             {
-                                var asyncMain = (IAsyncRosi)assembly.CreateInstance(type.FullName);
-                                if (asyncMain != null)
-                                    return await asyncMain.Run(this);
+                                var asyncRosi = (IAsyncRosi)assembly.CreateInstance(type.FullName);
+                                if (asyncRosi != null)
+                                {
+                                    var result = await asyncRosi.Run(this);
+                                    await DisposeRosi(asyncRosi);
+                                    return result;
+                                }
                             }
                             else if (typeof(IRosi).IsAssignableFrom(type))
                             {
-                                var main = (IRosi)assembly.CreateInstance(type.FullName);
-                                if (main != null)
-                                    return main.Run(this);
+                                var rosi = (IRosi)assembly.CreateInstance(type.FullName);
+                                if (rosi != null)
+                                {
+                                    var result = rosi.Run(this);
+                                    await DisposeRosi(rosi);
+                                    return result;
+                                }
                             }
                         }
                     }
