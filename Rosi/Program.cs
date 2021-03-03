@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Rosi.Core;
@@ -97,6 +98,7 @@ namespace Rosi
 
             var runtime = new Runtime(null, args);
 
+            Console.OutputEncoding = Encoding.UTF8;
             Console.Title = runtime.Config.Get("rosi.title", "Rosi");
             var result = await runtime.RunAsync();
 

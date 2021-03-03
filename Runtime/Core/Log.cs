@@ -75,14 +75,15 @@ namespace Rosi.Core
         {
             if (logLevel >= ConsoleLogLevel && ShowConsoleOutput || forceConsoleOutput)
             {
-                Console.ResetColor();
+                var color = Console.ForegroundColor;
+
                 if (logLevel >= LogLevels.Warning)
                     Console.ForegroundColor = ConsoleColor.Yellow;
                 if (logLevel > LogLevels.Warning)
                     Console.ForegroundColor = ConsoleColor.Red;
 
                 Console.Error.WriteLine(ConsoleExtendedMessage ? output : originalMessage);
-                Console.ResetColor();
+                Console.ForegroundColor = color;
             }
 
             try
