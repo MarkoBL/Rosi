@@ -24,6 +24,7 @@ namespace Rosi.Compiler
             _runtime = runtime;
             _assemblyDirectory = new DirectoryInfo(_runtime.Config.AssemblyPath);
 
+            CSScript.EvaluatorConfig.DebugBuild = true;
             CSScript.EvaluatorConfig.RefernceDomainAsemblies = false;
             CSScript.EvaluatorConfig.RefernceDomainAsemblies = !_runtime.Debugging;
             CSScript.GlobalSettings.AddSearchDir(_assemblyDirectory.FullName);
@@ -34,7 +35,6 @@ namespace Rosi.Compiler
             Evaluator.ReferenceAssembly(typeof(System.Net.IPNetwork).Assembly);
 
             Evaluator.DisableReferencingFromCode = true;
-            Evaluator.DebugBuild = false;
         }
 
         public async Task<CompilerResult> Compile(string name, string content)
@@ -112,7 +112,6 @@ namespace Rosi.Compiler
             }
 
             var scriptBuilder = new StringBuilder();
-
             foreach (var item in _results.Values)
             {
                 if (item.Assemby != null)
@@ -130,51 +129,30 @@ namespace Rosi.Compiler
                 return false;
             }
 
-            var outputPath = _runtime.Config.ScriptOutputPath;
-            if (!string.IsNullOrWhiteSpace(outputPath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(outputPath);
-                    await File.WriteAllTextAsync(Path.Combine(outputPath, name), script);
-                }
-                catch
-                { }
-            }
-
             var useCachedAssemblies = _runtime.Config.CacheAssemblies;
-            var filename = $"{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "") : "rosi")}.{rootClass}.dll";
-            var tempFile = Path.Combine(Path.GetTempPath(), filename);
 
-            var loaded = false;
-            if(useCachedAssemblies && File.Exists(tempFile))
+            var baseFileName = $"{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "") : "rosi")}.{rootClass}";
+            var pdbFilePath = Path.Combine(Path.GetTempPath(), $"{baseFileName}.pdb");
+            var assemblyFilPath = Path.Combine(Path.GetTempPath(), $"{baseFileName}.dll");
+
+            var loadedFromFile = false;
+            if(useCachedAssemblies && File.Exists(assemblyFilPath) && File.Exists(pdbFilePath))
             {
                 try
                 {
-                    Evaluator.ReferenceAssembly(tempFile);
-                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                    foreach(var ass in assemblies)
-                    {
-                        if(ass.EscapedCodeBase.Contains(filename))
-                        {
-                            result.Assemby = ass;
-                            loaded = true;
-                            break;
-                        }
-                    }
+                    var assemblyData = await File.ReadAllBytesAsync(assemblyFilPath);
+                    var pdbData = await File.ReadAllBytesAsync(pdbFilePath);
+
+                    result.Assemby = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
+                    loadedFromFile = true;
                 }
                 catch { }
             }
 
             try
             {
-                if (!loaded)
-                {
-                    var assembly = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = tempFile });
-                    result.Assemby = assembly;
-
-                    Evaluator.ReferenceAssembly(assembly);
-                }
+                if (!loadedFromFile)
+                    result.Assemby = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = assemblyFilPath, PdbFile = pdbFilePath });
             }
             catch(Exception ex)
             {
@@ -187,6 +165,22 @@ namespace Rosi.Compiler
 
                 result.SetError(CompilerResultType.CompileError, error);
                 return false;
+            }
+
+            var outputPath = _runtime.Config.ScriptOutputPath;
+            if (!string.IsNullOrWhiteSpace(outputPath))
+            {
+                try
+                {
+                    var scriptPath = Path.Combine(outputPath, name);
+                    if (!loadedFromFile || !File.Exists(scriptPath))
+                    {
+                        Directory.CreateDirectory(outputPath);
+                        await File.WriteAllTextAsync(scriptPath, script);
+                    }
+                }
+                catch
+                { }
             }
 
             foreach (var file in parsedScript.PostCompileFiles)
