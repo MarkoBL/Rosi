@@ -36,6 +36,7 @@ namespace Rosi.Compiler
         public ScriptParser ParsedScript { get; internal set; }
         public readonly string RootClass;
         public Assembly Assemby { get; internal set; }
+        public string FinalScript { get; internal set; }
 
         public readonly CompilerResult Root;
 

@@ -167,6 +167,8 @@ namespace Rosi.Compiler
                 return false;
             }
 
+            result.FinalScript = script;
+
             var outputPath = _runtime.Config.ScriptOutputPath;
             if (!string.IsNullOrWhiteSpace(outputPath))
             {
