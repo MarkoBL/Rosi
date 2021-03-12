@@ -1,16 +1,27 @@
 ﻿using Scriban.Runtime;
+using System;
 
 namespace Rosi.Scriban
 {
     public sealed class ScribanResult
     {
-        public readonly bool HasError;
-        public readonly string Error;
+        public readonly ScribanTemplate Template;
+        public bool HasTemplateError => !Template.IsValid;
+        public string TemplateError => Template.ErrorMessage;
+
+        public readonly bool HasScriptError;
+        public readonly string ScriptError;
+
+        public readonly bool HasRenderError;
+        public readonly string RenderError;
+
+        public string Error => HasScriptError ? ScriptError : (HasTemplateError ? TemplateError : (HasRenderError ? RenderError : null));
+
+        public bool HasError => HasTemplateError || HasScriptError || HasRenderError;
+        public bool IsValid => !HasError;
 
         public readonly string Output;
         public readonly string Filename;
-
-        public readonly bool Valid;
 
         readonly ScriptObject _result;
 
@@ -28,16 +39,23 @@ namespace Rosi.Scriban
             return (T)GetResult(name);
         }
 
-        public ScribanResult(string error, string output, ScriptObject result)
+        internal ScribanResult(ScribanTemplate template, ScriptObject result, string output, string renderError)
         {
-            HasError = !string.IsNullOrWhiteSpace(error);
-            Error = error;
+            _result = result;
+            Template = template;
 
-            Valid = (bool)result["valid"];
-            Filename = (string)result["filename"];
+            if(result != null)
+            {
+                ScriptError = (string)result["ScriptError"];
+                HasScriptError = !string.IsNullOrWhiteSpace(ScriptError);
+
+                Filename = (string)result["Filename"];
+            }
+
+            HasRenderError = !string.IsNullOrWhiteSpace(renderError);
+            RenderError = renderError;
 
             Output = output;
-            _result = result;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Scriban;
 using Scriban.Parsing;
@@ -13,22 +12,16 @@ namespace Rosi.Scriban
     {
         const string _initScript = @"
 {{-
-func setfilename
- Result.filename = $0
+func setfilename (filename)
+ Result.Filename = filename
 end
 
-func setvalid
- $valid = $0
- $error = $1
-
- Result.valid = $valid
- if !$valid && $error
-  Result.error = $error
- end
+func seterror (error)
+  Result.Error = $error
 end
 
-func setresult
- Result[$0] = $1
+func setresult (key, value)
+ Result[key] = value
 end
 
 -}}";
@@ -53,7 +46,7 @@ end
                 _context.NewLine = "\n";
 
             _context.PushGlobal(_globals);
-            Parse(_initScript);
+            Render(ScribanTemplate.Parse(_initScript));
         }
 
         public void ImportClass(Type type, string name = null)
@@ -84,60 +77,31 @@ end
             return new ValueTask<string>(((ITemplateLoader)this).Load(context, callerSpan, templatePath));
         }
 
-        public ScribanResult Render(string include, params string[] parameters)
+        public ScribanResult Render(ScribanTemplate template)
         {
-            var template = new StringBuilder($"{{{{- include '{include}' ");
-
-            foreach (var parameter in parameters)
-                template.Append($" '{parameter}' ");
-
-            template.Append(" -}}");
-
-            return Parse(template.ToString());
-        }
-
-        public ScribanResult Parse(string template)
-        {
-            var parsed = Template.Parse(template);
-            
-            var result = new ScriptObject
-            {
-                { "error", null },
-                { "filename", null },
-                { "valid", false}
-            };
-
-            _globals["Result"] = result;
-
-            if (parsed.HasErrors)
-            {
-                Log.Error(parsed.ToString(), this);
-
-                foreach (var error in parsed.Messages)
-                {
-                    Log.Error(error.ToString(), this);
-                }
-
-                return new ScribanResult(parsed.ToString(), null, result);
-            }
-
             try
             {
-                var output = parsed.Render(_context);
-                if(!string.IsNullOrEmpty(output) && _forceLinefeed && output.IndexOf('\r') >= 0)
-                    output = output.Replace("\r\n", "\n"); ;
+                if (!template.IsValid)
+                    return new ScribanResult(template, null, null, null);
 
-                var r = new ScribanResult((string)result["error"], output, result);
+                var result = new ScriptObject
+                {
+                    { "ScriptError", string.Empty },
+                    { "Filename", null }
+                };
 
-                if (r.HasError)
-                    Log.Warn($"Scriban script error: {r.Error}.", this);
+                _globals["Result"] = result;
 
-                return r;
+                var output = template.Template.Render(_context);
+                return new ScribanResult(template, result, output, null);
             }
             catch (Exception ex)
             {
+                Log.Error(template.Text);
                 Log.Error(ex.ToString(), this);
-                return new ScribanResult(ex.ToString(), null, result);
+                if (ex.InnerException != null)
+                    Log.HandleException(ex.InnerException, this);
+                return new ScribanResult(template, null, null, ex.ToString());
             }
         }
     }

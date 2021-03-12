@@ -1,5 +1,6 @@
 ﻿// set: rosi.waitafterexit 1
 // compile: Host
+using Rosi.Scriban;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -17,8 +18,8 @@ namespace ScribanTest
                 new Host { Name = "host2", Address = IPAddress.Parse("10.0.0.2") }
             });
 
-            var result = scriban.Render("hosts", "testhostname");
-            if (result.Valid)
+            var result = scriban.Render(ScribanTemplate.Load("hosts", "testhostname"));
+            if (result.IsValid)
             {
                 //System.IO.File.WriteAllText(result.Filename, result.Output);
                 Console.WriteLine(result.Output);

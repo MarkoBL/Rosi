@@ -3,13 +3,12 @@
 $hostname = $1
 
 $valid = (object.size $hostname) > 0
-
-setfilename "/etc/hosts"
-setvalid $valid "Hostname is missing"
-
 if !$valid
+ seterror "Hostname is missing"
  ret
 end
+
+setfilename "/etc/hosts"
 
 -}}
 127.0.0.1 localhost
