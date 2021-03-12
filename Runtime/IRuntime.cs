@@ -10,5 +10,4 @@ public interface IRuntime
     T GetValue<T>(string name);
     bool TryGetValue<T>(string name, out T value);
     void SetValue(string name, object value);
-
 }

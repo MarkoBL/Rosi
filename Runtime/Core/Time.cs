@@ -24,7 +24,7 @@ namespace Rosi.Core
             if (localTime)
                 date.ToLocalTime();
 
-            return $"{date.ToShortDateString()}  {date.ToShortTimeString()}";
+            return $"{ date.ToShortDateString() } { date.ToShortTimeString() }";
         }
 
         public static string TimeString(long timestamp, bool localTime)

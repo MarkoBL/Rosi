@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/MarkoBL/Rosi</PackageProjectUrl>
     <Title>Rosi Runtime</Title>
     <PackageId>Rosi.Runtime</PackageId>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
     <Authors>Marko B. Ludolph</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/MarkoBL/Rosi</RepositoryUrl>
@@ -16,7 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CS-Script.Core" Version="2.0.0" />
-    <PackageReference Include="IPNetwork2" Version="2.5.250" />
+    <PackageReference Include="IPNetwork2" Version="2.5.271" />
     <PackageReference Include="Scriban" Version="3.5.0" />
     <PackageReference Include="YamlDotNet" Version="9.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
