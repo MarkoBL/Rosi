@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.5
+- Compiler debug information fix
+
 ## 1.2.2
 - Downgraded CSScript back to version 1.4.0 due assembly reference errors
 
