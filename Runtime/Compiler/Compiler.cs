@@ -155,6 +155,11 @@ namespace Rosi.Compiler
                 if (!loadedFromFile)
                 {
                     result.Assemby = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = assemblyFilPath, PdbFile = pdbFilePath });
+
+                    // required for debug information
+                    var assemblyData = await File.ReadAllBytesAsync(assemblyFilPath);
+                    var pdbData = await File.ReadAllBytesAsync(pdbFilePath);
+                    result.Assemby = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
                 }
             }
             catch(Exception ex)
