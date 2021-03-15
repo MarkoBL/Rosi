@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.1
+- Reworked the scriban system
+
+## 1.2.0
+- Enabling debug symbols
+- Upgraded dependencies
+- Console UTF-8 output
+- Console error color fix
+- Added disposable support
+- Internal changes
+
 ## 1.1.0
 - Added support for custom translations
 
