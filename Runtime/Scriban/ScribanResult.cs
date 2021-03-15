@@ -3,59 +3,43 @@ using System;
 
 namespace Rosi.Scriban
 {
+    public enum ScribanResultType
+    {
+        Success,
+        TemplateError,
+        RenderError,
+        ScriptError
+    }
+
     public sealed class ScribanResult
     {
+        public readonly ScribanResultType ResultType;
+        public readonly ScribanRuntime Runtime;
         public readonly ScribanTemplate Template;
-        public bool HasTemplateError => !Template.IsValid;
-        public string TemplateError => Template.ErrorMessage;
 
-        public readonly bool HasScriptError;
-        public readonly string ScriptError;
-
-        public readonly bool HasRenderError;
-        public readonly string RenderError;
-
-        public string Error => HasScriptError ? ScriptError : (HasTemplateError ? TemplateError : (HasRenderError ? RenderError : null));
-
-        public bool HasError => HasTemplateError || HasScriptError || HasRenderError;
-        public bool IsValid => !HasError;
+        public bool HasError => !IsValid;
+        public bool IsValid => ResultType == ScribanResultType.Success;
 
         public readonly string Output;
-        public readonly string Filename;
+        public readonly string Error;
 
-        readonly ScriptObject _result;
-
-        public object GetResult(string name)
+        ScribanResult(ScribanResultType resultType, ScribanRuntime runtime, ScribanTemplate template)
         {
-            if (_result == null)
-                return null;
-
-            _result.TryGetValue(name, out var value);
-            return value;
-        }
-
-        public T GetResult<T>(string name)
-        {
-            return (T)GetResult(name);
-        }
-
-        internal ScribanResult(ScribanTemplate template, ScriptObject result, string output, string renderError)
-        {
-            _result = result;
+            ResultType = resultType;
+            Runtime = runtime;
             Template = template;
+        }
 
-            if(result != null)
+        internal ScribanResult(ScribanResultType resultType, ScribanRuntime runtime, ScribanTemplate template, string message) : this(resultType, runtime, template)
+        {
+            if(resultType == ScribanResultType.Success)
             {
-                ScriptError = (string)result["ScriptError"];
-                HasScriptError = !string.IsNullOrWhiteSpace(ScriptError);
-
-                Filename = (string)result["Filename"];
+                Output = message;
             }
-
-            HasRenderError = !string.IsNullOrWhiteSpace(renderError);
-            RenderError = renderError;
-
-            Output = output;
+            else
+            {
+                Error = message;
+            }
         }
     }
 }

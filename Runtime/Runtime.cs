@@ -38,7 +38,7 @@ namespace Rosi
             get
             {
                 if (_scriban == null)
-                    _scriban = new ScribanRuntime(new DirectoryInfo(Path.Combine(RootPath.FullName, Config.ScribanScriptPath)));
+                    _scriban = new ScribanRuntime(Path.Combine(RootPath.FullName, Config.ScribanScriptPath), true);
 
                 return _scriban;
             }

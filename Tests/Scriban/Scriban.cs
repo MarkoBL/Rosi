@@ -13,19 +13,21 @@ namespace ScribanTest
         {
             var scriban = runtime.Scriban;
 
-            scriban.ImportObject("Hosts", new List<Host> {
+            scriban.ImportObject(new List<Host> {
                 new Host { Name = "host1", Address = IPAddress.Parse("10.0.0.1") },
                 new Host { Name = "host2", Address = IPAddress.Parse("10.0.0.2") }
-            });
+            }, "Hosts");
 
             var result = scriban.Render(ScribanTemplate.Load("hosts", "testhostname"));
             if (result.IsValid)
             {
-                //System.IO.File.WriteAllText(result.Filename, result.Output);
+                //var filename = result.Runtime.GetGlobalValue<string>("Filename");
+                //System.IO.File.WriteAllText(filename, result.Output);
                 Console.WriteLine(result.Output);
                 return 0;
             }
 
+            Console.WriteLine(result.Error);
             return 1;
         }
     }

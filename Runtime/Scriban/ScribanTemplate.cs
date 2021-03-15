@@ -7,6 +7,8 @@ namespace Rosi.Scriban
 {
     public class ScribanTemplate
     {
+        static readonly Dictionary<string, ScribanTemplate> _scriptLookup = new Dictionary<string, ScribanTemplate>();
+
         public bool IsValid => !Template.HasErrors;
         public readonly string Text;
         public readonly string ErrorMessage;
@@ -27,8 +29,6 @@ namespace Rosi.Scriban
                 }
             }
         }
-
-        static readonly Dictionary<string, ScribanTemplate> _scriptLookup = new Dictionary<string, ScribanTemplate>();
 
         public static ScribanTemplate Parse2(string script, bool cache = true)
         {

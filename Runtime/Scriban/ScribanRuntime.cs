@@ -10,30 +10,28 @@ namespace Rosi.Scriban
 {
     public sealed class ScribanRuntime : ITemplateLoader, ILogger
     {
-        const string _initScript = @"
+        static readonly ScribanTemplate _initTemplate;
+        public static ScribanTemplate DefaultInitTemplate;
+
+        static ScribanRuntime()
+        {
+            _initTemplate = ScribanTemplate.Parse(@"
 {{-
-func setfilename (filename)
- Result.Filename = filename
+func setscripterror (error)
+  RosiScriptError = error
 end
+-}}");
+        }
 
-func seterror (error)
-  Result.Error = $error
-end
-
-func setresult (key, value)
- Result[key] = value
-end
-
--}}";
         readonly TemplateContext _context;
         readonly DirectoryInfo _scribanPath;
-
-        readonly ScriptObject _globals = new ScriptObject();
         readonly bool _forceLinefeed;
 
-        public ScribanRuntime(DirectoryInfo scribanPath, bool forceLineFeed = true)
+        public readonly ScriptObject Globals = new ScriptObject();
+
+        public ScribanRuntime(string scribanPath, bool forceLineFeed)
         {
-            _scribanPath = scribanPath;
+            _scribanPath = new DirectoryInfo(scribanPath);
 
             _context = new TemplateContext
             {
@@ -45,21 +43,40 @@ end
             if (_forceLinefeed)
                 _context.NewLine = "\n";
 
-            _context.PushGlobal(_globals);
-            Render(ScribanTemplate.Parse(_initScript));
+            _context.PushGlobal(Globals);
+            Render(_initTemplate);
+
+            if(DefaultInitTemplate != null)
+                Render(DefaultInitTemplate);
         }
 
-        public void ImportClass(Type type, string name = null)
+        public object GetGlobalValue(string name)
+        {
+            Globals.TryGetValue(name, out var value);
+            return value;
+        }
+
+        public T GetGlobalValue<T>(string name)
+        {
+            return (T)GetGlobalValue(name);
+        }
+
+        public bool HasGlobalValue(string name)
+        {
+            return Globals.ContainsKey(name);
+        }
+
+        public void ImportClass(Type type, string name)
         {
             var scriptObject = new ScriptObject();
             scriptObject.Import(type, null, (member) => member.Name);
 
-            _globals[name ?? type.Name] = scriptObject;
+            Globals[name] = scriptObject;
         }
 
-        public void ImportObject(string name, object value)
+        public void ImportObject(object value, string name)
         {
-            _globals[name] = value;
+            Globals[name] = value;
         }
 
         string ITemplateLoader.GetPath(TemplateContext context, SourceSpan callerSpan, string templateName)
@@ -82,18 +99,19 @@ end
             try
             {
                 if (!template.IsValid)
-                    return new ScribanResult(template, null, null, null);
+                    return new ScribanResult(ScribanResultType.TemplateError, this, template, template.ErrorMessage);
 
-                var result = new ScriptObject
-                {
-                    { "ScriptError", string.Empty },
-                    { "Filename", null }
-                };
-
-                _globals["Result"] = result;
+                Globals["RosiScriptError"] = string.Empty;
 
                 var output = template.Template.Render(_context);
-                return new ScribanResult(template, result, output, null);
+                if (!string.IsNullOrEmpty(output) && _forceLinefeed)
+                    output = output.Replace("\r\n", "\n"); ;
+
+                var scriptError = (string)Globals["RosiScriptError"];
+                if(!string.IsNullOrWhiteSpace(scriptError))
+                    return new ScribanResult(ScribanResultType.ScriptError, this, template, scriptError);
+
+                return new ScribanResult(ScribanResultType.Success, this, template, output);
             }
             catch (Exception ex)
             {
@@ -101,7 +119,7 @@ end
                 Log.Error(ex.ToString(), this);
                 if (ex.InnerException != null)
                     Log.HandleException(ex.InnerException, this);
-                return new ScribanResult(template, null, null, ex.ToString());
+                return new ScribanResult(ScribanResultType.RenderError, this, template, ex.ToString());
             }
         }
     }
