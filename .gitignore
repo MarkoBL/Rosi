@@ -11,3 +11,4 @@ wixobj/
 *.wixpdb
 *.zip
 *.msi
+Rosi/Properties/*.json

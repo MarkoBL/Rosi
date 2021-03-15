@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.2
+- Downgraded CSScript back to version 1.4.0 due assembly reference errors
+
 ## 1.2.1
 - Reworked the scriban system
 

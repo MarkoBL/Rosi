@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CSScriptLib;
@@ -25,7 +26,6 @@ namespace Rosi.Compiler
             _assemblyDirectory = new DirectoryInfo(_runtime.Config.AssemblyPath);
 
             CSScript.EvaluatorConfig.DebugBuild = true;
-            CSScript.EvaluatorConfig.RefernceDomainAsemblies = false;
             CSScript.EvaluatorConfig.RefernceDomainAsemblies = !_runtime.Debugging;
             CSScript.GlobalSettings.AddSearchDir(_assemblyDirectory.FullName);
 
@@ -84,6 +84,7 @@ namespace Rosi.Compiler
                 try
                 {
                     Evaluator.ReferenceAssembly(Path.Combine(_assemblyDirectory.FullName, ass));
+                    //Assembly.LoadFrom(Path.Combine(_assemblyDirectory.FullName, ass));
                     _loadedAssemblies.Add(ass);
                 }
                 catch(Exception ex)
@@ -152,7 +153,9 @@ namespace Rosi.Compiler
             try
             {
                 if (!loadedFromFile)
+                {
                     result.Assemby = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = assemblyFilPath, PdbFile = pdbFilePath });
+                }
             }
             catch(Exception ex)
             {
