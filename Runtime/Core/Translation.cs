@@ -173,8 +173,15 @@ namespace Rosi.Core
             {
                 if (_items.TryGetValue(key, out var value))
                 {
-                    if (parameterList != null)
-                        return string.Format(value, parameterList);
+                    try
+                    {
+                        if (parameterList != null)
+                            return string.Format(value, parameterList);
+                    }
+                    catch (FormatException ex)
+                    {
+                        Log.Error(Tr.Get("Translation.FormatException", key, parameterList.Length, ex.Message));
+                    }
                     return value;
                 }
                 return key;
@@ -185,8 +192,15 @@ namespace Rosi.Core
                 if (_items.TryGetValue(key, out var value))
                 {
                     success = true;
-                    if (parameterList != null && parameterList.Length > 0)
-                        return string.Format(value, parameterList);
+                    try
+                    {
+                        if (parameterList != null && parameterList.Length > 0)
+                            return string.Format(value, parameterList);
+                    }
+                    catch(FormatException ex)
+                    {
+                        Log.Error(Tr.Get("Translation.FormatException", key, parameterList.Length, ex.Message));
+                    }
                     return value;
                 }
 

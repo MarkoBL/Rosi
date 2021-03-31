@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.3.0
-
+- Fixed FormatException in translation
 
 ## 1.2.5
 - Compiler debug information fix
