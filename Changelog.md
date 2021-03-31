@@ -2,6 +2,7 @@
 
 ## 1.3.0
 - Fixed FormatException in translation
+- Fixed output bug by locking the console output
 
 ## 1.2.5
 - Compiler debug information fix

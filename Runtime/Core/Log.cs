@@ -21,6 +21,8 @@ namespace Rosi.Core
         static readonly HashSet<string> _ignores = new HashSet<string>();
         static StreamWriter _logStream = null;
 
+        static readonly object _consoleLock = new object();
+
         static Log()
         {
             AppDomain.CurrentDomain.UnhandledException += (object sender, UnhandledExceptionEventArgs e) =>
@@ -75,15 +77,18 @@ namespace Rosi.Core
         {
             if (logLevel >= ConsoleLogLevel && ShowConsoleOutput || forceConsoleOutput)
             {
-                var color = Console.ForegroundColor;
+                lock (_consoleLock)
+                {
+                    var color = Console.ForegroundColor;
 
-                if (logLevel >= LogLevels.Warning)
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                if (logLevel > LogLevels.Warning)
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    if (logLevel >= LogLevels.Warning)
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (logLevel > LogLevels.Warning)
+                        Console.ForegroundColor = ConsoleColor.Red;
 
-                Console.Error.WriteLine(ConsoleExtendedMessage ? output : originalMessage);
-                Console.ForegroundColor = color;
+                    Console.Error.WriteLine(ConsoleExtendedMessage ? output : originalMessage);
+                    Console.ForegroundColor = color;
+                }
             }
 
             try
