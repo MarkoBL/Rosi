@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.0
+
+
 ## 1.2.5
 - Compiler debug information fix
 
