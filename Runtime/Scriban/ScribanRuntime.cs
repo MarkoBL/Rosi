@@ -115,7 +115,7 @@ end
             }
             catch (Exception ex)
             {
-                Log.Error(template.Text);
+                Log.Error(template.GetTextWithLineNumbers());
                 Log.Error(ex.ToString(), this);
                 if (ex.InnerException != null)
                     Log.HandleException(ex.InnerException, this);

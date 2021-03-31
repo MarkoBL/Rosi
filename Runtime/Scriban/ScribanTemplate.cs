@@ -14,9 +14,11 @@ namespace Rosi.Scriban
         public readonly string ErrorMessage;
         internal readonly Template Template;
 
+        string _numberedText;
+
         ScribanTemplate(string text, Template template)
         {
-            Text = text;
+            Text = text.Replace("\r\n", "\n");
             Template = template;
 
             if(!IsValid)
@@ -28,6 +30,23 @@ namespace Rosi.Scriban
                     ErrorMessage += $"{message}\n";
                 }
             }
+        }
+
+        public string GetTextWithLineNumbers()
+        {
+            if (_numberedText != null)
+                return _numberedText;
+
+            var lines = Text.Split('\n');
+            var output = new StringBuilder();
+            for(var i = 1; i <= lines.Length; i++)
+            {
+                output.AppendLine($"{i} {lines[i - 1]}");
+            }
+
+            _numberedText = output.ToString();
+
+            return _numberedText;
         }
 
         public static ScribanTemplate Parse2(string script, bool cache = true)
