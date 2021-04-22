@@ -27,10 +27,11 @@ end
         readonly DirectoryInfo _scribanPath;
         readonly bool _forceLinefeed;
 
-        public readonly ScriptObject Globals = new ScriptObject();
+        public readonly ScriptObject Globals;
 
-        public ScribanRuntime(string scribanPath, bool forceLineFeed)
+        public ScribanRuntime(ScriptObject global, string scribanPath, bool forceLineFeed)
         {
+            Globals = global;
             _scribanPath = new DirectoryInfo(scribanPath);
 
             _context = new TemplateContext
@@ -50,6 +51,11 @@ end
                 Render(DefaultInitTemplate);
         }
 
+        public ScribanRuntime(string scribanPath, bool forceLineFeed) : this(new ScriptObject(), scribanPath, forceLineFeed)
+        {
+        }
+
+
         public object GetGlobalValue(string name)
         {
             Globals.TryGetValue(name, out var value);
@@ -66,12 +72,12 @@ end
             return Globals.ContainsKey(name);
         }
 
-        public void ImportClass(Type type, string name)
+        public void ImportClass(Type type, string name, ScriptObject importScriptObject = null)
         {
-            var scriptObject = new ScriptObject();
-            scriptObject.Import(type, null, (member) => member.Name);
+            importScriptObject ??= new ScriptObject();
+            importScriptObject.Import(type, null, (member) => member.Name);
 
-            Globals[name] = scriptObject;
+            Globals[name] = importScriptObject;
         }
 
         public void ImportObject(object value, string name)

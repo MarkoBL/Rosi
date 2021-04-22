@@ -4,6 +4,8 @@
 - Fixed FormatException in translation
 - Fixed output bug by locking the console output
 - Added script line numbers to scriban runtime exceptions
+- Added ThrowableScriptObject
+- Modified scriban runtime
 
 ## 1.2.5
 - Compiler debug information fix
