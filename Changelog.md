@@ -1,8 +1,10 @@
 # Changelog
 
+## 1.3.2
+- TemplateContext from scriban runtime is now public
+
 ## 1.3.1
 - Added script line numbers to scriban template errors
-
 
 ## 1.3.0
 - Fixed FormatException in translation

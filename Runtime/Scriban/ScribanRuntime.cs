@@ -23,7 +23,7 @@ end
 -}}");
         }
 
-        readonly TemplateContext _context;
+        public readonly TemplateContext Context;
         readonly DirectoryInfo _scribanPath;
         readonly bool _forceLinefeed;
 
@@ -34,7 +34,7 @@ end
             Globals = global;
             _scribanPath = new DirectoryInfo(scribanPath);
 
-            _context = new TemplateContext
+            Context = new TemplateContext
             {
                 TemplateLoader = this,
                 MemberRenamer = (memeber) => memeber.Name,
@@ -42,9 +42,9 @@ end
 
             _forceLinefeed = forceLineFeed;
             if (_forceLinefeed)
-                _context.NewLine = "\n";
+                Context.NewLine = "\n";
 
-            _context.PushGlobal(Globals);
+            Context.PushGlobal(Globals);
             Render(_initTemplate);
 
             if(DefaultInitTemplate != null)
@@ -109,7 +109,7 @@ end
 
                 Globals["RosiScriptError"] = string.Empty;
 
-                var output = template.Template.Render(_context);
+                var output = template.Template.Render(Context);
                 if (!string.IsNullOrEmpty(output) && _forceLinefeed)
                     output = output.Replace("\r\n", "\n"); ;
 
