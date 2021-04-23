@@ -37,16 +37,20 @@ namespace Rosi.Scriban
             if (_numberedText != null)
                 return _numberedText;
 
-            var lines = Text.Split('\n');
+            _numberedText = GetTextWithLineNumbers(Text);
+            return _numberedText;
+        }
+
+        static string GetTextWithLineNumbers(string script)
+        {
+            var lines = script.Split('\n');
             var output = new StringBuilder();
-            for(var i = 1; i <= lines.Length; i++)
+            for (var i = 1; i <= lines.Length; i++)
             {
                 output.AppendLine($"{i} {lines[i - 1]}");
             }
 
-            _numberedText = output.ToString();
-
-            return _numberedText;
+            return output.ToString();
         }
 
         public static ScribanTemplate Parse2(string script, bool cache = true)
@@ -65,7 +69,7 @@ namespace Rosi.Scriban
             var template = Template.Parse(script);
             if (template.HasErrors)
             {
-                Log.Error(script);
+                Log.Error(GetTextWithLineNumbers(script));
 
                 foreach (var message in template.Messages)
                 {

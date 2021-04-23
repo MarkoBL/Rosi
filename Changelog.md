@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+- Added script line numbers to scriban template errors
+
+
 ## 1.3.0
 - Fixed FormatException in translation
 - Fixed output bug by locking the console output
