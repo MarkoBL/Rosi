@@ -55,7 +55,6 @@ end
         {
         }
 
-
         public object GetGlobalValue(string name)
         {
             Globals.TryGetValue(name, out var value);
@@ -74,15 +73,12 @@ end
 
         public void ImportClass(Type type, string name, ScriptObject importScriptObject = null)
         {
-            importScriptObject ??= new ScriptObject();
-            importScriptObject.Import(type, null, (member) => member.Name);
-
-            Globals[name] = importScriptObject;
+            Globals.ImportClass(type, name, importScriptObject);
         }
 
         public void ImportObject(object value, string name)
         {
-            Globals[name] = value;
+            Globals.ImportObject(value, name);
         }
 
         string ITemplateLoader.GetPath(TemplateContext context, SourceSpan callerSpan, string templateName)

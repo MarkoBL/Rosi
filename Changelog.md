@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3
+- Added ScriptObjectExtensions
+- Added Property IgnoreUnknownMembers to ThrowableScriptObject
+
 ## 1.3.2
 - TemplateContext from scriban runtime is now public
 
