@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0
+- Set project sdk to "Microsoft.NET.Sdk" for the rosi executable to enable aspcore
+
+
 ## 1.3.3
 - Added ScriptObjectExtensions
 - Added Property IgnoreUnknownMembers to ThrowableScriptObject
