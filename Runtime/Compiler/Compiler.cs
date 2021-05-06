@@ -44,6 +44,11 @@ namespace Rosi.Compiler
             return result;
         }
 
+        public void ReferenceAssembly(Assembly assembly)
+        {
+            Evaluator.ReferenceAssembly(assembly);
+        }
+
         async Task<bool> Compile(string name, string content, CompilerResult parentResult, bool isRootScript)
         {
             var result = isRootScript ? parentResult : new CompilerResult(name, parentResult);
