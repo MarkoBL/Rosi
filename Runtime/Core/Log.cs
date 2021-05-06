@@ -196,5 +196,10 @@ namespace Rosi.Core
         {
             LogEvent(LogLevels.Fatal, message, logger, memberName, sourceFilePath, sourceLineNumber);
         }
+
+        public static void LogMessage(LogLevels logLevel, string message, ILogger logger = null, [CallerMemberName] string memberName = null, [CallerFilePath] string sourceFilePath = null, [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            LogEvent(logLevel, message, logger, memberName, sourceFilePath, sourceLineNumber);
+        }
     }
 }

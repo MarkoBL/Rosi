@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Rosi.Compiler;
@@ -157,7 +158,17 @@ namespace Rosi
                     var assembly = compilerResult?.Assemby;
                     if (assembly != null)
                     {
-                        var types = assembly.GetTypes();
+                        Type[] types = null;
+                        try
+                        {
+                            types = assembly.GetTypes();
+                        }
+                        catch(ReflectionTypeLoadException ex)
+                        {
+                            types = ex.Types;
+                            Log.HandleException(ex);
+                        }
+
                         foreach (var type in types)
                         {
                             if (typeof(IAsyncRosi).IsAssignableFrom(type))

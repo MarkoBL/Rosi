@@ -13,7 +13,7 @@ namespace Rosi.Compiler
     {
         readonly Runtime _runtime;
 
-        readonly DirectoryInfo _assemblyDirectory;
+        readonly List<DirectoryInfo> _assemblyDirectories = new List<DirectoryInfo>();
         readonly HashSet<string> _loadedAssemblies = new HashSet<string>();
 
         readonly Dictionary<string, CompilerResult> _results = new Dictionary<string, CompilerResult>();
@@ -23,11 +23,17 @@ namespace Rosi.Compiler
         internal Compiler(Runtime runtime)
         {
             _runtime = runtime;
-            _assemblyDirectory = new DirectoryInfo(_runtime.Config.AssemblyPath);
+
+            var pathList = _runtime.Config.AssemblyPath.Split(',');
+            foreach(var path in pathList)
+            {
+                var di = new DirectoryInfo(path.Trim());
+                _assemblyDirectories.Add(di);
+                CSScript.GlobalSettings.AddSearchDir(di.FullName);
+            }
 
             CSScript.EvaluatorConfig.DebugBuild = true;
             CSScript.EvaluatorConfig.RefernceDomainAsemblies = !_runtime.Debugging;
-            CSScript.GlobalSettings.AddSearchDir(_assemblyDirectory.FullName);
 
             Evaluator = CSScript.Evaluator;
 
@@ -88,11 +94,23 @@ namespace Rosi.Compiler
 
                 try
                 {
-                    Evaluator.ReferenceAssembly(Path.Combine(_assemblyDirectory.FullName, ass));
-                    //Assembly.LoadFrom(Path.Combine(_assemblyDirectory.FullName, ass));
-                    _loadedAssemblies.Add(ass);
+                    var found = false;
+                    foreach(var assemblyDirectory in _assemblyDirectories)
+                    {
+                        var assemblyPath = Path.Combine(assemblyDirectory.FullName, ass);
+                        if(File.Exists(assemblyPath))
+                        {
+                            Evaluator.ReferenceAssembly(assemblyPath);
+                            _loadedAssemblies.Add(ass);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                        throw new FileNotFoundException("Assembly not found.", ass);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     var error = Tr.Get("Compiler.AssemblyError", ass, ex.Message);
                     Log.Error(error, this);
@@ -100,6 +118,28 @@ namespace Rosi.Compiler
                     result.SetError(CompilerResultType.AssemblyError, error);
                     return false;
                 }
+            }
+
+            try
+            {
+                var assemblies = Evaluator.GetReferencedAssemblies();
+                foreach (var assembly in assemblies)
+                {
+                    assembly.GetTypes();
+                }
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                var error = new StringBuilder();
+                foreach (Exception loaderEx in ex.LoaderExceptions)
+                {
+                    error.AppendLine(loaderEx.Message);
+                }
+
+                var e = error.ToString();
+                Log.Error(e, this);
+                result.SetError(CompilerResultType.AssemblyError, e);
+                return false;
             }
 
             foreach (var file in parsedScript.CompileFiles)

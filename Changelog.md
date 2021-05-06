@@ -1,7 +1,11 @@
 # Changelog
 
 ## 2.0
-
+- runtime.assemblypath now accepts a comma separated list for multiple locations
+- Updated Scriban
+- Updated IPNetwork2
+- Updated Newtonsoft.Json
+- Updated YamlDotNet
 
 ## 1.3.3
 - Added ScriptObjectExtensions
