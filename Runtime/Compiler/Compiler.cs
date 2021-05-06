@@ -120,17 +120,20 @@ namespace Rosi.Compiler
                 }
             }
 
+            string assemblyErrName = null;
             try
             {
                 var assemblies = Evaluator.GetReferencedAssemblies();
                 foreach (var assembly in assemblies)
                 {
+                    assemblyErrName = assembly.FullName;
                     assembly.GetTypes();
                 }
             }
             catch (ReflectionTypeLoadException ex)
             {
                 var error = new StringBuilder();
+                error.AppendLine(assemblyErrName);
                 foreach (Exception loaderEx in ex.LoaderExceptions)
                 {
                     error.AppendLine(loaderEx.Message);
