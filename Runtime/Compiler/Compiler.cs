@@ -20,9 +20,21 @@ namespace Rosi.Compiler
 
         internal readonly IEvaluator Evaluator;
 
+        Assembly AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            Log.Warn(Tr.Get("Compiler.AssemblyResolve", args.Name, args.RequestingAssembly));
+            return null;
+        }
+
         internal Compiler(Runtime runtime)
         {
             _runtime = runtime;
+
+            if (_runtime.Config.AssemblyResolveInfo)
+            {
+                AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += AssemblyResolve;
+            }
 
             var pathList = _runtime.Config.AssemblyPath.Split(',');
             foreach(var path in pathList)
@@ -100,7 +112,8 @@ namespace Rosi.Compiler
                         var assemblyPath = Path.Combine(assemblyDirectory.FullName, ass);
                         if(File.Exists(assemblyPath))
                         {
-                            Evaluator.ReferenceAssembly(assemblyPath);
+                            var assembly = Assembly.LoadFrom(assemblyPath);
+                            Evaluator.ReferenceAssembly(assembly);
                             _loadedAssemblies.Add(ass);
                             found = true;
                             break;

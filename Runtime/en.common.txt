@@ -2,6 +2,7 @@
 Compiler.AssemblyError: Loading assembly "{0}" failed: {1}
 Compiler.Error: Compiling script "{0}" failed:\n{1}
 Compiler.ScriptEmpty: Compiling script "{0}" failed: Script is empty.
+Compiler.AssemblyResolve: Trying to resolve assembly "{0}" for "{1}"
 
 ScriptParser.CyclingInclude: Cyling include in script "{0}".
 ScriptParser.AlreadyIncluded: Script {1} again included in script "{0}".

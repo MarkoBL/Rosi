@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1
+- Bumped CS-Script.Core to 2.0.0
+- Modified assembly loading to be more verbose
+- Added runtime.assemblyresolveinfo for displaying assembly resolve information, default is true
+
 ## 2.0
 - runtime.assemblypath now accepts a comma separated list for multiple locations
 - Updated Scriban

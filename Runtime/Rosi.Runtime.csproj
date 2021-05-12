@@ -15,8 +15,8 @@
     <PackageLicenseFile>License.txt</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CS-Script.Core" Version="1.4.0" />
-    <PackageReference Include="IPNetwork2" Version="2.5.303" />
+    <PackageReference Include="CS-Script.Core" Version="2.0.0" />
+    <PackageReference Include="IPNetwork2" Version="2.5.307" />
     <PackageReference Include="Scriban" Version="3.7.0" />
     <PackageReference Include="YamlDotNet" Version="11.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
