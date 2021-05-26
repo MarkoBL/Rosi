@@ -1,4 +1,6 @@
-﻿using Rosi.Core;
+﻿// set: rosi.waitforexit 1
+
+using Rosi.Core;
 using System;
 using System.IO;
 using System.Threading.Tasks;
