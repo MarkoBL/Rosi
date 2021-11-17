@@ -51,6 +51,7 @@ namespace Rosi.Compiler
 
             Evaluator.ReferenceAssembly(GetType().Assembly);
             Evaluator.ReferenceAssembly(typeof(System.Net.IPNetwork).Assembly);
+            Evaluator.ReferenceAssembly(typeof(YamlDotNet.Core.IEmitter).Assembly);
 
             Evaluator.DisableReferencingFromCode = true;
         }

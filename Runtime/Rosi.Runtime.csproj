@@ -19,7 +19,6 @@
     <PackageReference Include="IPNetwork2" Version="2.5.366" />
     <PackageReference Include="Scriban" Version="5.0.0" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="en.common.txt" />
