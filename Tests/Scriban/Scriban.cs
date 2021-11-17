@@ -1,5 +1,5 @@
-﻿// set: rosi.waitafterexit 1
-// compile: Host
+﻿// set rosi.waitafterexit 1
+// include Host.cs
 using Rosi.Scriban;
 using System;
 using System.Collections.Generic;

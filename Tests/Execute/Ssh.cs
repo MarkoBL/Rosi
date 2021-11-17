@@ -1,4 +1,4 @@
-﻿// include: SshKey
+﻿// include SshKey.cs
 
 using System;
 using System.IO;

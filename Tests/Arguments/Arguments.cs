@@ -1,4 +1,4 @@
-﻿// set: config.test Hello Config!
+﻿// set config.test Hello Config!
 using System;
 
 namespace Arguments
