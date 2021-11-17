@@ -344,7 +344,7 @@ Hello Config From Linux!
 Hello Argument!
 ```
 
-** Directive os modifiers **
+**Directive os modifiers**
 
 Directives support os modifiers using the following format `directive(windows|macos|linux) directivevalue`. You can restrict directives to be executed only on certain os.
 
