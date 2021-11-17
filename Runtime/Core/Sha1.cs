@@ -5,7 +5,7 @@ namespace Rosi.Core
 {
     public static class Sha1
     {
-        static readonly SHA1 _sha = new SHA1CryptoServiceProvider();
+        static readonly SHA1 _sha = SHA1.Create();
 
         public static string Compute(byte[] data)
         {

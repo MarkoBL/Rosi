@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.0
+- Ported Rosi to .NET 6
+- Bumped the version of Rosi to reflect the underlying .NET version
+- Directives can have an os modifier, e.g. `// include(windows) WindowsSource/**` includes the source files from the 'WindowsSource' directory only when running on Windows
+- Removed compile/postcompile directive
+- Updated Scriban
+- Updated IPNetwork2
+- Updated YamlDotNet
+
 ## 2.1
 - Bumped CS-Script.Core to 2.0.0
 - Modified assembly loading to be more verbose

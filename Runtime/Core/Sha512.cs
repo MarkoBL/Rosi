@@ -5,7 +5,7 @@ namespace Rosi.Core
 {
     public static class Sha512
     {
-        static readonly SHA512CryptoServiceProvider _sha = new SHA512CryptoServiceProvider();
+        static readonly SHA512 _sha = SHA512.Create();
 
         public static string Compute(byte[] data)
         {

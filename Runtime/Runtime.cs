@@ -84,8 +84,7 @@ namespace Rosi
                 {
                     RootPath = _mainScript.Directory;
                     Directory.SetCurrentDirectory(RootPath.FullName);
-
-                    ScriptParser.ParseOptions(_mainScript, this);
+                    ScriptParser.ParseSetDirectives(_mainScript, this);
                 }
                 else
                 { 

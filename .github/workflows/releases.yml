@@ -69,13 +69,13 @@ jobs:
       run: dotnet restore
       
     - name: Build Single
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output single
 
     - name: Zip Single
       run: cd single && zip -9 -r ../single.zip . -x *.pdb
       
     - name: Build Multi
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multi
 
     - name: Zip Multi
       run: cd multi && zip -9 -r ../multi.zip . -x *.pdb
@@ -122,13 +122,13 @@ jobs:
       run: dotnet restore
       
     - name: Build Single
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output single
 
     - name: Zip Single
       run: cd single && zip -9 -r ../single.zip . -x *.pdb
       
     - name: Build Multi
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime osx-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multi
 
     - name: Zip Multi
       run: cd multi && zip -9 -r ../multi.zip . -x *.pdb
@@ -188,13 +188,13 @@ jobs:
       run: dotnet restore
       
     - name: Build Single
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output single
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output single
 
     - name: Zip Single
       run: cd single; del *.pdb; tar -a -cf ..\single.zip *.*
       
     - name: Build Multi
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true --output multi
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multi
 
     - name: Zip Multi
       run: cd multi; del *.pdb; tar -a -cf ../multi.zip *.*

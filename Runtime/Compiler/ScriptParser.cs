@@ -11,8 +11,6 @@ namespace Rosi.Compiler
         readonly Runtime _runtime;
         readonly StringBuilder _header = new StringBuilder();
         readonly StringBuilder _body = new StringBuilder();
-        readonly List<string> _compile = new List<string>();
-        readonly List<string> _postCompile = new List<string>();
         readonly List<string> _assemblies = new List<string>();
         readonly HashSet<string> _includes = new HashSet<string>();
 
@@ -21,8 +19,6 @@ namespace Rosi.Compiler
 
         public readonly string Script;
 
-        public IReadOnlyList<string> CompileFiles => _compile;
-        public IReadOnlyList<string> PostCompileFiles => _postCompile;
         public IReadOnlyList<string> AssemblyFiles => _assemblies;
 
         public ScriptParser(Runtime runtime, string name, string content)
@@ -34,88 +30,102 @@ namespace Rosi.Compiler
             }
         }
 
-        public static void ParseOptions(FileInfo fileInfo, Runtime runtime)
+        public static void ParseSetDirectives(FileInfo fileInfo, Runtime runtime)
         {
             var lines = File.ReadAllLines(fileInfo.FullName);
             foreach(var line in lines)
             {
-                ParseOptions(line.Trim(), runtime);
+                ParseSetDirectives(line, runtime);
             }
         }
 
-        static bool ParseOptions(string line, Runtime runtime)
+        static bool ParseSetDirectives(string line, Runtime runtime)
         {
             if (string.IsNullOrWhiteSpace(line) || line[0] != '/')
                 return false;
 
             var config = runtime.Config;
-            if (line.StartsWith("// set:", StringComparison.Ordinal))
+            if (IsDirective(runtime, line, "// set", out var directiveValue))
             {
-                var option = line.Substring(8).Trim();
-                var idx = option.IndexOf(' ');
+                var idx = directiveValue.IndexOf(' ');
                 if (idx > 0)
                 {
-                    var key = option.Substring(0, idx).Trim();
-                    var value = option.Substring(idx).Trim();
+                    var key = directiveValue.Substring(0, idx);
+                    var value = directiveValue.Substring(idx).Trim();
 
                     config[key] = value;
                 }
                 return true;
             }
-            else if (runtime.IsWindows && line.StartsWith("// setwindows:", StringComparison.Ordinal))
-            {
-                var option = line.Substring(15).Trim();
-                var idx = option.IndexOf(' ');
-                if (idx > 0)
-                {
-                    var key = option.Substring(0, idx).Trim();
-                    var value = option.Substring(idx).Trim();
 
-                    config[key] = value;
-                }
+            return false;
+        }
+
+        static bool IsCurrentOs(Runtime runtime, string[] osList)
+        {
+            if (osList.Length == 0)
                 return true;
-            }
-            else if (runtime.IsLinux && line.StartsWith("// setlinux:", StringComparison.Ordinal))
+
+            foreach(var os in osList)
             {
-                var option = line.Substring(13).Trim();
-                var idx = option.IndexOf(' ');
-                if (idx > 0)
+                if (os == "windows")
                 {
-                    var key = option.Substring(0, idx).Trim();
-                    var value = option.Substring(idx).Trim();
-
-                    config[key] = value;
+                    if (runtime.IsWindows)
+                        return true;
                 }
-                return true;
+                else if (os == "linux")
+                {
+                    if (runtime.IsLinux)
+                        return true;
+                }
+                else if (os == "macos")
+                {
+                    if (runtime.IsMacOs)
+                        return true;
+                }
+                else
+                {
+                    Log.Warn(Tr.Get("ScriptParser.InvalidDirectiveOs", os));
+                }
             }
-            else if (runtime.IsMacOs && line.StartsWith("// setmacos:", StringComparison.Ordinal))
+            return false;
+        }
+
+        static bool IsDirective(Runtime runtime, string line, string key, out string directiveValue)
+        {
+            if(line.StartsWith(key, StringComparison.Ordinal) && line.Length > key.Length)
             {
-                var option = line.Substring(13).Trim();
-                var idx = option.IndexOf(' ');
-                if (idx > 0)
+                var startChar = line[key.Length];
+                if(startChar == ':' || startChar == ' ')
                 {
-                    var key = option.Substring(0, idx).Trim();
-                    var value = option.Substring(idx).Trim();
-
-                    config[key] = value;
+                    directiveValue = line.Substring(key.Length + 1).TrimStart();
+                    return true;
                 }
-                return true;
-            }
-            else if (line.StartsWith("// debugset:", StringComparison.Ordinal))
-            {
-                var option = line.Substring(13).Trim();
-                var idx = option.IndexOf(' ');
-                if (idx > 0)
+                else if (startChar == '(')
                 {
-                    var key = option.Substring(0, idx).Trim();
-                    var value = option.Substring(idx).Trim();
+                    var endPosition = line.IndexOf(')', key.Length + 1);
+                    if(endPosition == -1)
+                    {
+                        Log.Warn(Tr.Get("ScriptParser.InvalidDirective", line));
 
-                    if (runtime.Debugging)
-                        config[key] = value;
+                        directiveValue = null;
+                        return false;
+                    }
+
+                    var osList = line.Substring(key.Length + 1, endPosition - key.Length - 1).Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if(IsCurrentOs(runtime, osList))
+                    {
+                        var valueStartPosition = endPosition + 1;
+                        if (line[valueStartPosition] == ':')
+                            valueStartPosition += 1;
+
+                        directiveValue = line.Substring(valueStartPosition).TrimStart();
+                        return true;
+                    }
                 }
-                return true;
             }
 
+            directiveValue = null;
             return false;
         }
 
@@ -171,31 +181,9 @@ namespace Rosi.Compiler
                 {
                     continue;
                 }
-                else if (line.StartsWith("// compile:", StringComparison.Ordinal))
+                else if (IsDirective(_runtime, line, "// include", out var includeValue))
                 {
-                    var scriptFiles = line.Substring(12).Split(',', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var scriptFile in scriptFiles)
-                    {
-                        var file = scriptFile.Trim();
-                        if (!_compile.Contains(file))
-                            _compile.Add(file);
-                    }
-                    continue;
-                }
-                else if (line.StartsWith("// postcompile:", StringComparison.Ordinal))
-                {
-                    var scriptFiles = line.Substring(16).Split(',', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var scriptFile in scriptFiles)
-                    {
-                        var file = scriptFile.Trim();
-                        if (!_compile.Contains(file))
-                            _postCompile.Add(file);
-                    }
-                    continue;
-                }
-                else if (line.StartsWith("// include:", StringComparison.Ordinal))
-                {
-                    var scriptFiles = line.Substring(12).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    var scriptFiles = includeValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var scriptFile in scriptFiles)
                     {
                         if (scriptFile.EndsWith("*"))
@@ -231,13 +219,13 @@ namespace Rosi.Compiler
                     }
                     continue;
                 }
-                else if (ParseOptions(line, _runtime))
+                else if (ParseSetDirectives(line, _runtime))
                 {
                     continue;
                 }
-                else if (line.StartsWith("// assembly:", StringComparison.Ordinal))
+                else if (IsDirective(_runtime, line, "// assembly", out var assemblyValue))
                 {
-                    var assemblyFiles = line.Substring(13).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    var assemblyFiles = assemblyValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var assembly in assemblyFiles)
                     {
                         var file = assembly.Trim();

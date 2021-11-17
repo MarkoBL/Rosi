@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>rosi</AssemblyName>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
@@ -10,7 +10,7 @@
     <Authors>Marko B. Ludolph</Authors>
     <Copyright>Copyright Marko B. Ludolph</Copyright>
     <Product>Rosi</Product>
-    <Version>2.1.0</Version>
+    <Version>6.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

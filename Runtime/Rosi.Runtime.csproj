@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Rosi</RootNamespace>
     <PackOnBuild>true</PackOnBuild>
     <Copyright>Copyright Marko B. Ludolph</Copyright>
     <PackageProjectUrl>https://github.com/MarkoBL/Rosi</PackageProjectUrl>
     <Title>Rosi Runtime</Title>
     <PackageId>Rosi.Runtime</PackageId>
-    <Version>2.1.0</Version>
+    <Version>6.0.0</Version>
     <Authors>Marko B. Ludolph</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/MarkoBL/Rosi</RepositoryUrl>
@@ -16,9 +16,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CS-Script.Core" Version="2.0.0" />
-    <PackageReference Include="IPNetwork2" Version="2.5.307" />
-    <PackageReference Include="Scriban" Version="3.7.0" />
-    <PackageReference Include="YamlDotNet" Version="11.1.1" />
+    <PackageReference Include="IPNetwork2" Version="2.5.366" />
+    <PackageReference Include="Scriban" Version="5.0.0" />
+    <PackageReference Include="YamlDotNet" Version="11.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
   <ItemGroup>

@@ -158,21 +158,6 @@ namespace Rosi.Compiler
                 return false;
             }
 
-            foreach (var file in parsedScript.CompileFiles)
-            {
-                var (fileInfo, error) = parsedScript.GetScriptFileInfo(file);
-                if (fileInfo == null || !fileInfo.Exists)
-                {
-                    result.SetError(CompilerResultType.ParserError, error);
-                    return false;
-                }
-
-                if (!await Compile(fileInfo.Name, File.ReadAllText(fileInfo.FullName), result, false))
-                {
-                    return false;
-                }
-            }
-
             var scriptBuilder = new StringBuilder();
             foreach (var item in _results.Values)
             {
@@ -252,21 +237,6 @@ namespace Rosi.Compiler
                 }
                 catch
                 { }
-            }
-
-            foreach (var file in parsedScript.PostCompileFiles)
-            {
-                var (fileInfo, error) = parsedScript.GetScriptFileInfo(file);
-                if (!fileInfo.Exists)
-                {
-                    result.SetError(CompilerResultType.ParserError, error);
-                    return false;
-                }
-
-                if (!await Compile(fileInfo.Name, File.ReadAllText(fileInfo.FullName), result, false))
-                {
-                    return false;
-                }
             }
 
             return true;

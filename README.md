@@ -1,4 +1,4 @@
-# Rosi
+# Rosi 6
 
 **The power of .NET Core in a single executable**
 
@@ -8,12 +8,10 @@
 
 **Rosi** is an easy way to run your C# code everywhere, especially on Linux and macOS. No need to mess around with package management. **Rosi** is just a single executable file that you need to run your C# code. Just put it on your USB drive and you're done.
 
-> Side note: We use **Rosi** on desktop computers for automation to help the users get their stuff done faster (generate reports, process Excel sheets, etc). We usually put all the script files into a readonly network share and the users just have to double click on the correct `.rosi` file. No need to build and deploy binary files to individual computers (what a nightmare), it is 100% independent from the users operating system and we still get the native speed of the .NET Core framework. We only replace the script files on the network share and we're done.
-
-
 You only have to modify your code to impelement the `IRosi` or `IAsyncRosi` and you're done.
 
 ```Csharp
+#!/usr/local/bin/rosi 
 using System;
 
 public class Rosi : IRosi
@@ -27,13 +25,9 @@ public class Rosi : IRosi
 ```
 
 ```
-> rosi HelloWord.cs
+> ./HelloWord.cs
 Hello World!
 ```
-
-> Side note: We use [SaltStack](https://www.saltstack.com/) to manage our servers and the servers from our customers. It is a great and simple way to automate the management of our infrastructure. And therefore we have some rules, two of them are: We don't configure anything by hand, everything is done by using salt and we don't touch the package management of a system and add any external sources, if it's not really required. Using salt only is often not enough, we have to write scripts here and there to glue everything together. And we used [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) scripts. But while you can writing complex scripts in bash, you usually don't want to do that.
-
-> We thought about using a real programming language with good debugging support that runs on all important operating systems and we decided to use C# (seriously, it's a great language, static typed languages ftw!). But installing the .NET Core runtime on every system is a little overkill for running small scripts and didn't play nice with our own rules. **Rosi** was the solution to this problem.
 
 ## Install
 
@@ -95,6 +89,8 @@ symlink_rosi:
 {% endif %}
 ```
 
+> Side note: We use [SaltStack](https://www.saltstack.com/) to manage our servers and the servers from our customers. It is a great and simple way to automate the management of our infrastructure. And therefore we have some rules, two of them are: We don't configure anything by hand, everything is done by using salt and we don't touch the package management of a system and add any external sources, if it's not really required. Using salt only is often not enough, we have to write scripts here and there to glue everything together. And we used [Bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) scripts. But while you can writing complex scripts in bash, you usually don't want to do that.
+
 ### macOS
 
 *Terminal*
@@ -147,6 +143,8 @@ A more simple solution would be to move the `rosi.exe` into your Windows directo
 
 Associate the `.rosi` file extension with **Rosi**. Look at this [tutorial](https://www.digitaltrends.com/computing/how-to-change-file-associations/) and select the *rosi.exe* in the last step.
 
+> Side note: We use **Rosi** on desktop computers for automation to help the users get their stuff done faster (generate reports, process Excel sheets, etc). We usually put all the script files into a readonly network share and the users just have to double click on the correct `.rosi` file. No need to build and deploy binary files to individual computers (what a nightmare), it is 100% independent from the users operating system and we still get the native speed of the .NET Core framework. We only replace the script files on the network share and we're done.
+
 ## Running 
 
 ### Command Line
@@ -177,7 +175,7 @@ The script `script.rosi` contains only the shebang and other directives and incl
 `script.rosi`
 ```Csharp
 #!/usr/local/bin/rosi 
-// include: script.cs
+// include script.cs
 ```
 
 `script.cs`
@@ -256,14 +254,13 @@ class Script : IRosi
 
 ## Directives
 
-**// include:**
+**// include**
 
-The include directive actually includes the content of the script file into the current script. 
+The include directive includes the content of the specified script file into the current script. 
 This is done by splitting the script into a header and body part and insert it at the right locations in the current script.
 You can specify a wildcard to include all `.rosi` and `.cs`. Use `include *` to include all files in the current directory or
 `include **` to include all files in the current directory and all the subdirectories. You can also specify a directory to
 include files, e.g. `include Source/**`.
-
 
 ```Csharp
 class A
@@ -281,8 +278,9 @@ class A
     }
 }
 ```
+
 ```Csharp
-// include: A
+// include A
 class B : IRosi
 {
     public void Test()
@@ -296,51 +294,12 @@ class B : IRosi
 }
 ```
 
-> A side note: Once we had a large script of entity definitions (a few thousand lines), with a lot of circling references (entity A was referencing entity B and vice versa). Therefore, we couldn't break them down into different assemblies. This wasn't a big problem at all for us, as all this code didn't contain much logic. But it was a huge problem for Visual Studio, as it wasn't able to process the script in a reasonable time. Sometimes it took a few secondes before it accepted a key strokes or updated intellisense. After a while (and lots of swearing), we decided to implement the *include* directive. We put all the entities in separate script files and added an empty script that simply includes all of them. Problem solved.
+**// assembly**
 
-
-**// compile:**
-
-*You should usually use the include directive.*
-The compile directive compiles a script into an assembly. 
-The *Rosi.Runtime* will automatically reference and include the compiled assembliy. 
-The compiling happens before the actual script that contains the directive will be compiled.
-If it can't find the specified file, it will add the `.rosi` extension and will try it again. If this fails too, it will add the `.cs` file extension. If all tries fail, the runtime will exit.
-
-`A.cs`
-```Csharp
-class A
-{
-    public int Compiled()
-    {
-        return 0;
-    }
-}
-```
-
-`B.cs`
-```Csharp
-// compile: A // this will actually resolve to A.cs
-class B : IRosi
-{
-    public int Run(IRuntime runtime)
-    {
-        return new A().Compiled();
-    }
-}
-```
-
-**// postcompile:**
-
-*You should usually use the include directive.*
-This acts like the compile directive, but the script will be compiled into an assembly, AFTER the script that contains it is compiled.
-
-**// assembly:**
-
-Loads an assembly into the *Rosi.Runtime*.
+Loads an assembly into the *Rosi.Runtime*. Multiple assemblies can be loaded by separate every assembly by a comma.
 
 ```Csharp
-// assembly: Newtonsoft.Json.dll
+// assembly Newtonsoft.Json.dll
 using Newtonsoft.Json;
 class Json : IRosi
 {
@@ -352,16 +311,15 @@ class Json : IRosi
 }
 ```
 
-**// set, setlinux, setmacos, setwindows or debugset:**
+**// set**
 
-Sets internal or custom options. *Setlinux*, *setmacos*, *setwindows* will set this option only on the matching os. It is also possible to specify options via arguments. *Debugset* works only while debugging a script, otherwise it is ignored.
+Sets internal or custom options. It is also possible to specify options via arguments.
 
 `A.cs`
 ```Csharp
-// set: config.test Hello Config!
-// setlinux: config.test Hello Config From Linux!
-// set: argument.test Will be overriden by the command argument
-// setdebug: runtime.logtofile 1
+// set config.test Hello Config!
+// set(linux) config.test Hello Config From Linux!
+// set argument.test Will be overriden by the command argument
 class A : IRosi
 {
     public int Run(IRuntime runtime)
@@ -386,9 +344,27 @@ Hello Config From Linux!
 Hello Argument!
 ```
 
-## Options
+** Directive os modifiers **
 
-Internal options for the *Rosi.Runtime*. You can set the options via the **set/debugset** directive or as a argument when running a script.
+Directives support os modifiers using the following format `directive(windows|macos|linux) directivevalue`. You can restrict directives to be executed only on certain os.
+
+Set an assembly path for every os:
+```
+// set(windows) runtime.assemblypath ./WindowsAssemblies
+// set(linux) runtime.assemblypath ./LinuxAssemblies
+// set(macos) runtime.assemblypath ./MacOsAssemblies
+```
+
+You can combine multiple os:
+```
+// set(linux|macos) mood Yay
+// set(windows) mood Nay
+```
+
+
+## Internal Options
+
+Internal options for the *Rosi.Runtime*. You can set the options via the **set** directive or as a argument when running a script.
 
 **runtime.scriptpath**
 
@@ -460,7 +436,7 @@ public class Host
 
 `Scriban.cs`
 ```Csharp
-// compile: Host
+// include Host
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -532,8 +508,6 @@ ff02::2 ip6-allrouters
 10.0.0.1 host1
 10.0.0.2 host2
 ```
-
-> Side note: We use SaltStack and Rosi to manage our and our customers clients and servers. We generate the required configurations on the local salt master with Rosi and deploy them afterwards using SaltStack. We have more control over the output and it is easier to spot and debug errors.
 
 ### In Memory of Rosi
 
