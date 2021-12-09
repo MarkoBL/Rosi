@@ -24,7 +24,6 @@ namespace Rosi
         static void PrintRuntimeVersions()
         {
             Print($"Rosi Runtime: {Runtime.RuntimeVersion.ToString(3)}");
-            Print($"CS-Script: {Runtime.CSScriptVersion.ToString(3)}");
             Print($"Scriban: {Runtime.ScribanVersion.ToString(3)}");
             Print($".NET Core: {Runtime.NetCoreVersion}");
         }
@@ -71,6 +70,9 @@ namespace Rosi
 
         static async Task<int> Main(string[] args)
         {
+            typeof(YamlDotNet.Core.IEmitter).GetType();
+            typeof(System.Net.IPNetwork).GetType();
+
             foreach (var arg in args)
             {
                 if (arg == "--rosiversion")

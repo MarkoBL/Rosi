@@ -2,7 +2,6 @@
 Compiler.AssemblyError: Loading assembly "{0}" failed: {1}
 Compiler.Error: Compiling script "{0}" failed:\n{1}
 Compiler.ScriptEmpty: Compiling script "{0}" failed: Script is empty.
-Compiler.AssemblyResolve: Trying to resolve assembly "{0}" for "{1}"
 
 ScriptParser.CyclingInclude: Cyling include in script "{0}".
 ScriptParser.AlreadyIncluded: Script '{1}' again included in script "{0}".
@@ -15,5 +14,8 @@ Runtime.MainScriptMissing: Main script '{0}' not found.
 Runtime.NoArgs: Usage: rosi /path/to/script
 Runtime.DebugNoMainScript: Main script not set or found during debugging. The working directory is not set to the script root directory and config options are not parsed.
 Runtime.UnknownLogLevel: {0} is an invalid log level. Use Trace, Debug, Info, Warning, Error or Fatal.
+Runtime.AssemblyResolve: Trying to resolve assembly "{0}" for "{1}"
+Runtime.AssemblyResolveException: Resolving assembly "{0}" for "{1}" failed with "{2}".
+Runtime.AssemblyResolveFailed: Resolving assembly "{0}" for "{1}" failed.
 
 Translation.FormatException: Formatting translation '{0}' with {1} parameters failed: {2}

@@ -15,7 +15,6 @@ namespace Rosi
     public class Runtime : IRuntime, ILogger
     {
         public static Version RuntimeVersion => typeof(Runtime).Assembly.GetName().Version;
-        public static Version CSScriptVersion => typeof(CSScriptLib.CSScript).Assembly.GetName().Version;
         public static Version ScribanVersion => typeof(global::Scriban.Template).Assembly.GetName().Version;
         public static Version NetCoreVersion => Environment.Version;
 
@@ -23,6 +22,7 @@ namespace Rosi
         readonly FileInfo _mainScript;
         ScribanRuntime _scriban;
         readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+        readonly List<DirectoryInfo> _assemblyDirectories = new List<DirectoryInfo>();
 
         public DirectoryInfo RootPath { get; private set; }
         public Config Config { get; private set; }
@@ -33,6 +33,7 @@ namespace Rosi
         internal bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         public bool Debugging => Debugger.IsAttached && _debugMainType != null;
+        public IReadOnlyList<DirectoryInfo> AssemblyDirectories => _assemblyDirectories;
 
         public ScribanRuntime Scriban
         {
@@ -113,15 +114,46 @@ namespace Rosi
                 Log.Warn(Tr.Get("Runtime.UnknownLogLevel", Config.FileLogLevel));
 
             Tr.LoadFiles(new DirectoryInfo(Config.TranslationPath));
+
+            AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += AssemblyResolve;
+
+            _assemblyDirectories.Add(new DirectoryInfo(Path.GetDirectoryName(333.GetType().Assembly.Location)));
+            var pathList = Config.AssemblyPath.Split(',');
+            foreach (var path in pathList)
+            {
+                var di = new DirectoryInfo(path.Trim());
+                if(di.Exists)
+                    _assemblyDirectories.Add(di);
+            }
+
             Compiler = new Compiler.Compiler(this);
         }
 
-        async ValueTask DisposeRosi(object rosi)
+        Assembly AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            if (rosi is IDisposable disposable)
-                disposable.Dispose();
-            if (rosi is IAsyncDisposable asyncDisposable)
-                await asyncDisposable.DisposeAsync();
+            if (Config.AssemblyResolveInfo)
+                Log.Warn(Tr.Get("Runtime.AssemblyResolve", args.Name, args.RequestingAssembly));
+
+            try
+            {
+                var assemblyName = args.Name.Split(',')[0];
+                foreach(var di in _assemblyDirectories)
+                {
+                    var assemblyPath = $"{di.FullName}/{assemblyName}.dll";
+                    if(File.Exists(assemblyPath))
+                        return Assembly.LoadFrom(assemblyPath);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(Tr.Get("Runtime.AssemblyResolveException", args.Name, args.RequestingAssembly, ex.Message));
+                return null;
+            }
+
+            Log.Error(Tr.Get("Runtime.AssemblyResolveFailed", args.Name, args.RequestingAssembly));
+            return null;
         }
 
         public async Task<int> RunAsync()
@@ -153,7 +185,7 @@ namespace Rosi
                     if (compilerResult.Result != CompilerResultType.Ok)
                         return -1;
 
-                    var assembly = compilerResult?.Assemby;
+                    var assembly = compilerResult?.Assembly;
                     if (assembly != null)
                     {
                         Type[] types = null;
@@ -201,6 +233,14 @@ namespace Rosi
 
             Log.Fatal(Tr.Get("Runtime.NoMainFound", _mainScript.Name), this);
             return -1;
+        }
+
+        async ValueTask DisposeRosi(object rosi)
+        {
+            if (rosi is IDisposable disposable)
+                disposable.Dispose();
+            if (rosi is IAsyncDisposable asyncDisposable)
+                await asyncDisposable.DisposeAsync();
         }
 
         T IRuntime.GetValue<T>(string name)

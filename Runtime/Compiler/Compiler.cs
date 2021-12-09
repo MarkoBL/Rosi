@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Scripting;
+using Rosi.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using CSScriptLib;
-using Rosi.Core;
 
 namespace Rosi.Compiler
 {
@@ -13,47 +17,30 @@ namespace Rosi.Compiler
     {
         readonly Runtime _runtime;
 
-        readonly List<DirectoryInfo> _assemblyDirectories = new List<DirectoryInfo>();
         readonly HashSet<string> _loadedAssemblies = new HashSet<string>();
 
         readonly Dictionary<string, CompilerResult> _results = new Dictionary<string, CompilerResult>();
 
-        internal readonly IEvaluator Evaluator;
+        readonly List<Assembly> _referencedAssemblies = new List<Assembly>();
 
-        Assembly AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            Log.Warn(Tr.Get("Compiler.AssemblyResolve", args.Name, args.RequestingAssembly));
-            return null;
-        }
+
 
         internal Compiler(Runtime runtime)
         {
             _runtime = runtime;
 
-            if (_runtime.Config.AssemblyResolveInfo)
+            var mscorelib = 333.GetType().Assembly;
+            var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            foreach (var assembly in domainAssemblies)
             {
-                AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
-                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += AssemblyResolve;
+                if(assembly != mscorelib)
+                    _referencedAssemblies.Add(assembly);
             }
 
-            var pathList = _runtime.Config.AssemblyPath.Split(',');
-            foreach(var path in pathList)
-            {
-                var di = new DirectoryInfo(path.Trim());
-                _assemblyDirectories.Add(di);
-                CSScript.GlobalSettings.AddSearchDir(di.FullName);
-            }
-
-            CSScript.EvaluatorConfig.DebugBuild = true;
-            CSScript.EvaluatorConfig.ReferenceDomainAssemblies = !_runtime.Debugging;
-
-            Evaluator = CSScript.Evaluator;
-
-            Evaluator.ReferenceAssembly(GetType().Assembly);
-            Evaluator.ReferenceAssembly(typeof(System.Net.IPNetwork).Assembly);
-            Evaluator.ReferenceAssembly(typeof(YamlDotNet.Core.IEmitter).Assembly);
-
-            Evaluator.DisableReferencingFromCode = true;
+            ReferenceAssembly(GetType().Assembly);
+            ReferenceAssembly(typeof(System.Net.IPNetwork).Assembly);
+            ReferenceAssembly(typeof(YamlDotNet.Core.IEmitter).Assembly);
         }
 
         public async Task<CompilerResult> Compile(string name, string content)
@@ -65,7 +52,8 @@ namespace Rosi.Compiler
 
         public void ReferenceAssembly(Assembly assembly)
         {
-            Evaluator.ReferenceAssembly(assembly);
+            if (!_referencedAssemblies.Contains(assembly))
+                _referencedAssemblies.Add(assembly);
         }
 
         async Task<bool> Compile(string name, string content, CompilerResult parentResult, bool isRootScript)
@@ -108,13 +96,13 @@ namespace Rosi.Compiler
                 try
                 {
                     var found = false;
-                    foreach(var assemblyDirectory in _assemblyDirectories)
+                    foreach(var assemblyDirectory in _runtime.AssemblyDirectories)
                     {
                         var assemblyPath = Path.Combine(assemblyDirectory.FullName, ass);
                         if(File.Exists(assemblyPath))
                         {
                             var assembly = Assembly.LoadFrom(assemblyPath);
-                            Evaluator.ReferenceAssembly(assembly);
+                            ReferenceAssembly(assembly);
                             _loadedAssemblies.Add(ass);
                             found = true;
                             break;
@@ -137,8 +125,7 @@ namespace Rosi.Compiler
             string assemblyErrName = null;
             try
             {
-                var assemblies = Evaluator.GetReferencedAssemblies();
-                foreach (var assembly in assemblies)
+                foreach (var assembly in _referencedAssemblies)
                 {
                     assemblyErrName = assembly.FullName;
                     assembly.GetTypes();
@@ -162,7 +149,7 @@ namespace Rosi.Compiler
             var scriptBuilder = new StringBuilder();
             foreach (var item in _results.Values)
             {
-                if (item.Assemby != null)
+                if (item.Assembly != null)
                     scriptBuilder.AppendLine($"using static {item.RootClass};");
             }
 
@@ -179,7 +166,7 @@ namespace Rosi.Compiler
 
             var useCachedAssemblies = _runtime.Config.CacheAssemblies;
 
-            var baseFileName = $"{(useCachedAssemblies ? Sha1.Compute(script).Replace("-", "") : "rosi")}.{rootClass}";
+            var baseFileName = $"{Sha1.Compute($"{Sha1.Compute(script)}|{Environment.UserName}").Replace("-", "")}-{rootClass}-rosi";
             var pdbFilePath = Path.Combine(Path.GetTempPath(), $"{baseFileName}.pdb");
             var assemblyFilPath = Path.Combine(Path.GetTempPath(), $"{baseFileName}.dll");
 
@@ -191,7 +178,7 @@ namespace Rosi.Compiler
                     var assemblyData = await File.ReadAllBytesAsync(assemblyFilPath);
                     var pdbData = await File.ReadAllBytesAsync(pdbFilePath);
 
-                    result.Assemby = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
+                    result.Assembly = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
                     loadedFromFile = true;
                 }
                 catch { }
@@ -201,12 +188,63 @@ namespace Rosi.Compiler
             {
                 if (!loadedFromFile)
                 {
-                    result.Assemby = Evaluator.CompileCode(script, new CompileInfo { PreferLoadingFromFile = useCachedAssemblies, RootClass = rootClass, AssemblyFile = assemblyFilPath, PdbFile = pdbFilePath });
+                    var compilerSettings = ScriptOptions.Default.AddReferences(_referencedAssemblies);
+                    var compilation = CSharpScript.Create(script, compilerSettings).GetCompilation();
 
-                    // required for debug information
-                    var assemblyData = await File.ReadAllBytesAsync(assemblyFilPath);
-                    var pdbData = await File.ReadAllBytesAsync(pdbFilePath);
-                    result.Assemby = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
+                    compilation = compilation.WithOptions(compilation.Options
+                        .WithOutputKind(OutputKind.DynamicallyLinkedLibrary)
+                        .WithOptimizationLevel(OptimizationLevel.Release)
+                        .WithScriptClassName(rootClass)
+                        );
+
+                    using var pdb = new MemoryStream();
+                    using var asm = new MemoryStream();
+                    var emitOptions = new EmitOptions(false, DebugInformationFormat.PortablePdb);
+                    var emitResult = compilation.Emit(asm, pdb, options: emitOptions);
+
+                    if (!emitResult.Success)
+                    {
+                        IEnumerable<Diagnostic> failures = emitResult.Diagnostics.Where(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error);
+
+                        var message = new StringBuilder();
+                        foreach (Diagnostic diagnostic in failures)
+                        {
+                            string error_location = "";
+                            if (diagnostic.Location.IsInSource)
+                            {
+                                var error_pos = diagnostic.Location.GetLineSpan().StartLinePosition;
+
+                                int error_line = error_pos.Line + 1;
+                                int error_column = error_pos.Character + 1;
+
+                                var source = "<script>";
+                                //if (mapping.Any())
+                                //    (source, error_line) = mapping.Translate(error_line);
+                                //else
+                                //    error_line--; // no mapping as it was a single file so translation is minimal
+
+                                // the actual source contains an injected '#line' directive of compiled with debug symbols so increment line after formatting
+                                //error_location = $"{(source.HasText() ? source : "<script>")}({error_line},{ error_column}): ";
+                            }
+                            message.AppendLine($"{error_location}error {diagnostic.Id}: {diagnostic.GetMessage()}");
+                        }
+
+                        var errors = message.ToString();
+                        throw new Exception(errors);
+                    }
+                    else
+                    {
+                        asm.Seek(0, SeekOrigin.Begin);
+                        var assemblyData = asm.GetBuffer();
+
+                        pdb.Seek(0, SeekOrigin.Begin);
+                        var pdbData = pdb.GetBuffer();
+
+                        await File.WriteAllBytesAsync(assemblyFilPath, assemblyData);
+                        await File.WriteAllBytesAsync(pdbFilePath, pdbData);
+
+                        result.Assembly = AppDomain.CurrentDomain.Load(assemblyData, pdbData);
+                    }
                 }
             }
             catch(Exception ex)

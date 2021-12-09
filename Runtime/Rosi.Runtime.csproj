@@ -15,8 +15,8 @@
     <PackageLicenseFile>License.txt</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CS-Script" Version="4.2.0" />
-    <PackageReference Include="IPNetwork2" Version="2.5.366" />
+    <PackageReference Include="IPNetwork2" Version="2.5.381" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.0.1" />
     <PackageReference Include="Scriban" Version="5.0.0" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>
