@@ -45,7 +45,7 @@ namespace Rosi.Compiler
             }
 
             CSScript.EvaluatorConfig.DebugBuild = true;
-            CSScript.EvaluatorConfig.RefernceDomainAsemblies = !_runtime.Debugging;
+            CSScript.EvaluatorConfig.ReferenceDomainAssemblies = !_runtime.Debugging;
 
             Evaluator = CSScript.Evaluator;
 
