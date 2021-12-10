@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public static class Tr
     {

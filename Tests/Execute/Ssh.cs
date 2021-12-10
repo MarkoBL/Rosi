@@ -22,7 +22,7 @@ namespace Execute
             var privateKeyFile = Path.Combine(_tempPath, guid.ToString());
             var publicKeyFile = Path.Combine(_tempPath, $"{guid}.pub");
 
-            var execute = await Rosi.Core.Execute.RunAsync("ssh-keygen", $"-t ed25519 -f {privateKeyFile} -C \"\" -q -N \"\"");
+            var execute = await Rosi.Runtime.Core.Execute.RunAsync("ssh-keygen", $"-t ed25519 -f {privateKeyFile} -C \"\" -q -N \"\"");
 
             if(execute.ExitCode == 0)
             {

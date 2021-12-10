@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public static class Log
     {

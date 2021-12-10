@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
+using Rosi.Runtime;
 
 namespace Rosi.Tests
 {
@@ -18,13 +19,13 @@ namespace Rosi.Tests
             return Debug ? typeof(T) : null;
         }
 
-        static Runtime NewRuntime<T>(params string[] args)
+        static Runtime.Runtime NewRuntime<T>(params string[] args)
         {
             if (_rootPath == null)
                 _rootPath = new DirectoryInfo(BasePath);
 
             Directory.SetCurrentDirectory(_rootPath.FullName);
-            return new Runtime(DebugType<T>(), args).SetValue("playground", true);
+            return new Runtime.Runtime(DebugType<T>(), args).SetValue("playground", true);
         }
 
         [Fact]

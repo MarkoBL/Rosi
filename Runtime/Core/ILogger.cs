@@ -1,4 +1,4 @@
-﻿namespace Rosi.Core
+﻿namespace Rosi.Runtime.Core
 {
     public interface ILogger
     {

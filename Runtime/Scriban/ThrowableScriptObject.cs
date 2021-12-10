@@ -4,7 +4,7 @@ using Scriban.Runtime;
 using System;
 using System.Collections.Generic;
 
-namespace Rosi.Scriban
+namespace Rosi.Runtime.Scriban
 {
     public class ThrowableScriptObject : ScriptObject
     {

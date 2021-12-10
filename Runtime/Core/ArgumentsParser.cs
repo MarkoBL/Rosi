@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
 	// http://www.codeproject.com/Articles/3111/C-NET-Command-Line-Arguments-Parser
 	sealed class ArgumentsParser

@@ -372,7 +372,7 @@ Sets a separate directory for the scripts, default is the location of the main s
 
 **runtime.assemblypath**
 
-Sets a separate directory for assemblies, default is the location of the main script.
+Sets one or multiple directories (comma separated list) for assemblies, default is the location of the main script. 
 
 **runtime.usecachedassemblies**
 
@@ -402,7 +402,7 @@ The name or path of the log file, default is log.txt.
 
 Appends the log output to the current log file, otherwise the log file will be overwritten every run. Default is true.
 
-**runtime.logscript**
+**runtime.logscriptonerror**
 
 Show the actual script in the log ouput, if the compilation fails.
 

@@ -6,34 +6,39 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Rosi.Compiler;
-using Rosi.Core;
-using Rosi.Scriban;
+using Rosi.Runtime.Compiler;
+using Rosi.Runtime.Core;
+using Rosi.Runtime.Scriban;
 
-namespace Rosi
+namespace Rosi.Runtime
 {
     public class Runtime : IRuntime, ILogger
     {
+        public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        public static bool IsMacOs => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+        public static bool IsLinux => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+
         public static Version RuntimeVersion => typeof(Runtime).Assembly.GetName().Version;
         public static Version ScribanVersion => typeof(global::Scriban.Template).Assembly.GetName().Version;
         public static Version NetCoreVersion => Environment.Version;
+
+        public static readonly Assembly MsCoreLib = 1961.GetType().Assembly;
 
         readonly Type _debugMainType;
         readonly FileInfo _mainScript;
         ScribanRuntime _scriban;
         readonly Dictionary<string, object> _values = new Dictionary<string, object>();
         readonly List<DirectoryInfo> _assemblyDirectories = new List<DirectoryInfo>();
+        readonly List<Assembly> _referencedAssemblies = new List<Assembly>();
 
         public DirectoryInfo RootPath { get; private set; }
         public Config Config { get; private set; }
-        public Compiler.Compiler Compiler { get; private set; }
-
-        internal bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        internal bool IsMacOs = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-        internal bool IsLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         public bool Debugging => Debugger.IsAttached && _debugMainType != null;
+
         public IReadOnlyList<DirectoryInfo> AssemblyDirectories => _assemblyDirectories;
+        public IReadOnlyList<Assembly> ReferencedAssemblies => _referencedAssemblies;
 
         public ScribanRuntime Scriban
         {
@@ -48,10 +53,6 @@ namespace Rosi
 
         static Runtime()
         {
-            // force inclusion of bundled assemblies
-            typeof(YamlDotNet.Core.IEmitter).GetType();
-            typeof(System.Net.IPNetwork).GetType();
-
             Tr.Init(CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         }
 
@@ -84,7 +85,7 @@ namespace Rosi
                 {
                     RootPath = _mainScript.Directory;
                     Directory.SetCurrentDirectory(RootPath.FullName);
-                    ScriptParser.ParseSetDirectives(_mainScript, this);
+                    ScriptParser.ParseSetDirectives(_mainScript, (key, value) => Config[key] = value);
                 }
                 else
                 { 
@@ -118,7 +119,6 @@ namespace Rosi
             AppDomain.CurrentDomain.AssemblyResolve += AssemblyResolve;
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += AssemblyResolve;
 
-            _assemblyDirectories.Add(new DirectoryInfo(Path.GetDirectoryName(333.GetType().Assembly.Location)));
             var pathList = Config.AssemblyPath.Split(',');
             foreach (var path in pathList)
             {
@@ -126,8 +126,18 @@ namespace Rosi
                 if(di.Exists)
                     _assemblyDirectories.Add(di);
             }
+            _assemblyDirectories.Add(new DirectoryInfo(Path.GetDirectoryName(MsCoreLib.Location)));
 
-            Compiler = new Compiler.Compiler(this);
+            var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in domainAssemblies)
+            {
+                if (assembly != MsCoreLib)
+                    _referencedAssemblies.Add(assembly);
+            }
+
+            ReferenceAssembly(GetType().Assembly);
+            ReferenceAssembly(typeof(System.Net.IPNetwork).Assembly);
+            ReferenceAssembly(typeof(YamlDotNet.Core.IEmitter).Assembly);
         }
 
         Assembly AssemblyResolve(object sender, ResolveEventArgs args)
@@ -156,10 +166,24 @@ namespace Rosi
             return null;
         }
 
+        public void AddAssemblyDirectory(DirectoryInfo directoryInfo)
+        {
+            if(directoryInfo.Exists)
+                _assemblyDirectories.Add(directoryInfo);
+        }
+
+        public void ReferenceAssembly(Assembly assembly)
+        {
+            if (!_referencedAssemblies.Contains(assembly))
+            {
+                _referencedAssemblies.Add(assembly);
+                assembly.GetTypes();
+            }
+        }
+
         public async Task<int> RunAsync()
         {
-            if (Compiler == null)
-                return -1;
+            var compiler = new Compiler.Compiler(this);
 
             try
             {
@@ -181,7 +205,18 @@ namespace Rosi
                 }
                 else
                 {
-                    var compilerResult = await Compiler.Compile(_mainScript.Name, File.ReadAllText(_mainScript.FullName));
+                    var compilerOptions = new CompilerOptions
+                    {
+                        Debugging = Debugging,
+                        ScriptPath = Config.ScriptPath,
+                        ScriptNamespace = Config.ScriptNamespace,
+                        UseCachedAssemblies = Config.UseCachedAssemblies,
+                        ScriptOutputPath = Config.ScriptOutputPath,
+                        LogScriptOnError = Config.LogScriptOnError,
+                        SetDirective = (key, value) => Config[key] = value
+                    };
+
+                    var compilerResult = await CompileScript(_mainScript, compilerOptions);
                     if (compilerResult.Result != CompilerResultType.Ok)
                         return -1;
 
@@ -241,6 +276,12 @@ namespace Rosi
                 disposable.Dispose();
             if (rosi is IAsyncDisposable asyncDisposable)
                 await asyncDisposable.DisposeAsync();
+        }
+
+        public async Task<CompilerResult> CompileScript(FileInfo fileInfo, CompilerOptions compilerOptions)
+        {
+            var compiler = new Compiler.Compiler(this);
+            return await compiler.Compile(fileInfo.Name, File.ReadAllText(fileInfo.FullName), compilerOptions);
         }
 
         T IRuntime.GetValue<T>(string name)

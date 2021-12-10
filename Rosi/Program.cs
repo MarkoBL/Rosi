@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Rosi.Core;
+using Rosi.Runtime.Core;
 
 namespace Rosi
 {
@@ -18,14 +18,14 @@ namespace Rosi
 
         static void PrintVersion()
         {
-            Print(Runtime.RuntimeVersion.ToString(3));
+            Print(Runtime.Runtime.RuntimeVersion.ToString(3));
         }
 
         static void PrintRuntimeVersions()
         {
-            Print($"Rosi Runtime: {Runtime.RuntimeVersion.ToString(3)}");
-            Print($"Scriban: {Runtime.ScribanVersion.ToString(3)}");
-            Print($".NET Core: {Runtime.NetCoreVersion}");
+            Print($"Rosi Runtime: {Runtime.Runtime.RuntimeVersion.ToString(3)}");
+            Print($"Scriban: {Runtime.Runtime.ScribanVersion.ToString(3)}");
+            Print($".NET Core: {Runtime.Runtime.NetCoreVersion}");
         }
 
         static void PrintMacOsWelcome()
@@ -40,7 +40,7 @@ namespace Rosi
         {
             try
             {
-                var version = Runtime.RuntimeVersion;
+                var version = Runtime.Runtime.RuntimeVersion;
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("Rosi", version.ToString(3)));
@@ -98,7 +98,7 @@ namespace Rosi
             }
 
 
-            var runtime = new Runtime(null, args);
+            var runtime = new Runtime.Runtime(null, args);
 
             Console.OutputEncoding = Encoding.UTF8;
             Console.Title = runtime.Config.Get("rosi.title", "Rosi");

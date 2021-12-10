@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public sealed class Execute
     {

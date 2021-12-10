@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Rosi.Core;
+using Rosi.Runtime.Core;
 
-namespace Rosi.Compiler
+namespace Rosi.Runtime.Compiler
 {
     public sealed class ScriptParser : ILogger
     {
-        readonly Runtime _runtime;
+        readonly ScriptParserOptions _options;
         readonly StringBuilder _header = new StringBuilder();
         readonly StringBuilder _body = new StringBuilder();
         readonly List<string> _assemblies = new List<string>();
@@ -16,36 +16,31 @@ namespace Rosi.Compiler
 
         public ScriptParserResult Result { get; private set; }
         public string Error { get; private set; }
-
         public readonly string Script;
-
         public IReadOnlyList<string> AssemblyFiles => _assemblies;
 
-        public ScriptParser(Runtime runtime, string name, string content)
+        public ScriptParser(ScriptParserOptions options, string name, string content)
         {
-            _runtime = runtime;
+            _options = options;
             if (ParseScript(name, content))
             {
                 Script = _header.ToString() + _body.ToString();
             }
         }
 
-        public static void ParseSetDirectives(FileInfo fileInfo, Runtime runtime)
+        public static void ParseSetDirectives(FileInfo fileInfo, Action<string, string> setDirective)
         {
             var lines = File.ReadAllLines(fileInfo.FullName);
             foreach(var line in lines)
-            {
-                ParseSetDirectives(line, runtime);
-            }
+                ParseSetDirectives(line, setDirective);
         }
 
-        static bool ParseSetDirectives(string line, Runtime runtime)
+        static bool ParseSetDirectives(string line, Action<string, string> set)
         {
             if (string.IsNullOrWhiteSpace(line) || line[0] != '/')
                 return false;
 
-            var config = runtime.Config;
-            if (IsDirective(runtime, line, "// set", out var directiveValue))
+            if (IsDirective(line, "// set", out var directiveValue))
             {
                 var idx = directiveValue.IndexOf(' ');
                 if (idx > 0)
@@ -53,7 +48,7 @@ namespace Rosi.Compiler
                     var key = directiveValue.Substring(0, idx);
                     var value = directiveValue.Substring(idx).Trim();
 
-                    config[key] = value;
+                    set?.Invoke(key, value);
                 }
                 return true;
             }
@@ -61,7 +56,7 @@ namespace Rosi.Compiler
             return false;
         }
 
-        static bool IsCurrentOs(Runtime runtime, string[] osList)
+        static bool IsCurrentOs(string[] osList)
         {
             if (osList.Length == 0)
                 return true;
@@ -70,17 +65,17 @@ namespace Rosi.Compiler
             {
                 if (os == "windows")
                 {
-                    if (runtime.IsWindows)
+                    if (Runtime.IsWindows)
                         return true;
                 }
                 else if (os == "linux")
                 {
-                    if (runtime.IsLinux)
+                    if (Runtime.IsLinux)
                         return true;
                 }
                 else if (os == "macos")
                 {
-                    if (runtime.IsMacOs)
+                    if (Runtime.IsMacOs)
                         return true;
                 }
                 else
@@ -91,7 +86,7 @@ namespace Rosi.Compiler
             return false;
         }
 
-        static bool IsDirective(Runtime runtime, string line, string key, out string directiveValue)
+        static bool IsDirective(string line, string key, out string directiveValue)
         {
             if(line.StartsWith(key, StringComparison.Ordinal) && line.Length > key.Length)
             {
@@ -113,7 +108,7 @@ namespace Rosi.Compiler
                     }
 
                     var osList = line.Substring(key.Length + 1, endPosition - key.Length - 1).Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    if(IsCurrentOs(runtime, osList))
+                    if(IsCurrentOs(osList))
                     {
                         var valueStartPosition = endPosition + 1;
                         if (line[valueStartPosition] == ':')
@@ -175,22 +170,22 @@ namespace Rosi.Compiler
             foreach (var l in lines)
             {
                 var line = l.Trim();
-                var scriptNamespace = _runtime.Config.ScriptNamespace;
+                var scriptNamespace = _options.ScriptNamespace;
 
                 if (line.StartsWith("#!/", StringComparison.Ordinal)) // shebang
                 {
                     continue;
                 }
-                else if (IsDirective(_runtime, line, "// include", out var includeValue))
+                else if (IsDirective(line, "// include", out var includeValue))
                 {
                     var scriptFiles = includeValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var scriptFile in scriptFiles)
                     {
                         if (scriptFile.EndsWith("*"))
                         {
-                            var p = Path.Combine(_runtime.Config.ScriptPath, scriptFile.Replace("*", ""));
+                            var p = Path.Combine(_options.ScriptPath, scriptFile.Replace("*", ""));
                             var files = GetFiles(p, scriptFile.EndsWith("**"));
-                            var scriptPath = new DirectoryInfo(_runtime.Config.ScriptPath).FullName;
+                            var scriptPath = new DirectoryInfo(_options.ScriptPath).FullName;
                             if (!scriptPath.EndsWith(Path.DirectorySeparatorChar))
                                 scriptPath += Path.DirectorySeparatorChar;
 
@@ -219,11 +214,11 @@ namespace Rosi.Compiler
                     }
                     continue;
                 }
-                else if (ParseSetDirectives(line, _runtime))
+                else if (ParseSetDirectives(line, _options.SetDirective))
                 {
                     continue;
                 }
-                else if (IsDirective(_runtime, line, "// assembly", out var assemblyValue))
+                else if (IsDirective(line, "// assembly", out var assemblyValue))
                 {
                     var assemblyFiles = assemblyValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var assembly in assemblyFiles)
@@ -324,7 +319,7 @@ namespace Rosi.Compiler
 
         public (FileInfo, string) GetScriptFileInfo(string name)
         {
-            var path = _runtime.Config.ScriptPath;
+            var path = _options.ScriptPath;
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var fileInfo = new FileInfo(Path.Combine(path, name));

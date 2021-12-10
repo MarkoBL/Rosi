@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public static class Sha1
     {

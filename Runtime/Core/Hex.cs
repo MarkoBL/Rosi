@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public static class Hex
     {

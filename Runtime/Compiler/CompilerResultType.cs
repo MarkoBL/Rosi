@@ -1,4 +1,4 @@
-﻿namespace Rosi.Compiler
+﻿namespace Rosi.Runtime.Compiler
 {
     public enum CompilerResultType
     {

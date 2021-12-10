@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using Scriban;
-using Rosi.Core;
+using Rosi.Runtime.Core;
 using System.Collections.Generic;
 
-namespace Rosi.Scriban
+namespace Rosi.Runtime.Scriban
 {
     public class ScribanTemplate
     {

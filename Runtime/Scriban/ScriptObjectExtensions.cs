@@ -1,7 +1,7 @@
 ﻿using System;
 using Scriban.Runtime;
 
-namespace Rosi.Scriban
+namespace Rosi.Runtime.Scriban
 {
     public static class ScriptObjectExtensions
     {

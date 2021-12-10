@@ -1,22 +1,21 @@
 ﻿using System;
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public static class Time
     {
         public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        public static long Timestamp => DateTimeToTimestamp(DateTime.UtcNow);
 
         public static long DateTimeToTimestamp(DateTime value)
         {
             var elapsedTime = value - Epoch;
-            return (long)elapsedTime.TotalSeconds;
+            return (long)elapsedTime.TotalMilliseconds;
         }
 
         public static DateTime TimestampToDateTime(long timestamp)
         {
-            return Epoch.AddSeconds(timestamp);
+            return Epoch.AddMilliseconds(timestamp);
         }
-
-        public static long Timestamp => DateTimeToTimestamp(DateTime.UtcNow);
 
         public static string DateTimeString(long timestamp, bool localTime)
         {

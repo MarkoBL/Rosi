@@ -1,7 +1,7 @@
 ﻿using Scriban.Runtime;
 using System;
 
-namespace Rosi.Scriban
+namespace Rosi.Runtime.Scriban
 {
     public enum ScribanResultType
     {

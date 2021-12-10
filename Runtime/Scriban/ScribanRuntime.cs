@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Scriban;
 using Scriban.Parsing;
 using Scriban.Runtime;
-using Rosi.Core;
+using Rosi.Runtime.Core;
 
-namespace Rosi.Scriban
+namespace Rosi.Runtime.Scriban
 {
     public sealed class ScribanRuntime : ITemplateLoader, ILogger
     {

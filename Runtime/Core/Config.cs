@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Rosi.Core
+namespace Rosi.Runtime.Core
 {
     public sealed class Config : Dictionary<string, string>
     {
@@ -14,10 +14,10 @@ namespace Rosi.Core
         public bool LogToConsole => Get("runtime.logtoconsole", true);
         public string ConsoleLogLevel => Get("runtime.consoleloglevel", LogLevels.Info.ToString());
         public string FileLogLevel => Get("runtime.fileloglevel", LogLevels.Warning.ToString());
-        public bool LogScript => Get("runtime.logscript", false);
+        public bool LogScriptOnError => Get("runtime.logscriptonerror", false);
         public string TranslationPath => Get("runtime.translationpath", ".");
 
-        public bool CacheAssemblies => Get("runtime.usecachedassemblies", true);
+        public bool UseCachedAssemblies => Get("runtime.usecachedassemblies", true);
         public string ScriptPath => Get("runtime.scriptpath", ".");
         public string AssemblyPath => Get("runtime.assemblypath", ".");
         public bool AssemblyResolveInfo => Get("runtime.assemblyresolveinfo", false);
