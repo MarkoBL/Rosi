@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Rosi.Runtime.Compiler;
-using Rosi.Runtime.Core;
+using Rosi.Runtime;
 using Rosi.Runtime.Scriban;
 
 public interface IRuntime

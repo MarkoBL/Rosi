@@ -3,6 +3,7 @@
 ## 6.0
 - Ported Rosi to .NET 6
 - Bumped the version of Rosi to reflect the underlying .NET version
+- Added ARM/ARM64 support
 - Use Roslyn to compile the script files into assemblies and remove the dependency of CS-Script
 - Refactored Runtime.Compiler to be useable from scripts. Now, you can compile a script within a script.
 - Directives can have an os modifier, e.g. `// include(windows) WindowsSource/**` includes the source files from the 'WindowsSource' directory only when running on Windows

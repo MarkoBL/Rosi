@@ -6,6 +6,10 @@ obj/
 *.user
 single/
 multi/
+singlearm/
+multiarm/
+singlearm64/
+multiarm64/
 wix/
 wixobj/
 *.wixpdb

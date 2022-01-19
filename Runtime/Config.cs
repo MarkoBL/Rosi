@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Rosi.Runtime.Core;
+using System;
 using System.Collections.Generic;
 
-namespace Rosi.Runtime.Core
+namespace Rosi.Runtime
 {
     public sealed class Config : Dictionary<string, string>
     {
