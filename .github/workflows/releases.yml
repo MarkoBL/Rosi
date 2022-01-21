@@ -81,25 +81,25 @@ jobs:
       run: cd multi && zip -9 -r ../multi.zip . -x *.pdb
 
     - name: Build Single ARM
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output singlearm
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-arm --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output singlearm
 
     - name: Zip Single ARM
       run: cd singlearm && zip -9 -r ../singlearm.zip . -x *.pdb
       
     - name: Build Multi ARM
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multiarm
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-arm --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multiarm
 
     - name: Zip Multi ARM
       run: cd multiarm && zip -9 -r ../multiarm.zip . -x *.pdb
 
     - name: Build Single ARM64
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output singlearm64
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-arm64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output singlearm64
 
     - name: Zip Single ARM64
       run: cd singlearm64 && zip -9 -r ../singlearm64.zip . -x *.pdb
       
     - name: Build Multi ARM64
-      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multiarm64
+      run: dotnet publish Rosi/Rosi.csproj --configuration Release --runtime linux-arm64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:PublishReadyToRunShowWarnings=true /p:IncludeAllContentForSelfExtract=true --output multiarm64
 
     - name: Zip Multi ARM64
       run: cd multiarm64 && zip -9 -r ../multiarm64.zip . -x *.pdb
