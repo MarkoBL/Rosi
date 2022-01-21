@@ -96,7 +96,7 @@ namespace Rosi.Runtime
                     }
                     else
                     {
-                        var error = Tr.Get("Runtime.MainScriptMissing", args[0]);
+                        var error = Tr.Get("Runtime.MainScriptMissing", _mainScript?.FullName ?? args[0]);
                         Log.Fatal(error, this);
                         throw new FileNotFoundException(error);
                     }

@@ -8,7 +8,7 @@ namespace Rosi.Tests
 {
     public class Test
     {
-        public static string BasePath = ".";
+        public static string BasePath = "../../../";
         public static bool UnitTest = true;
         public static bool Debug;
 
