@@ -70,8 +70,9 @@ namespace Rosi.Runtime
                 }
                 else
                 {
-                    Log.Fatal(Tr.Get("Runtime.NoArgs"), this);
-                    return;
+                    var error = Tr.Get("Runtime.NoArgs");
+                    Log.Fatal(error, this);
+                    throw new ArgumentException(error, nameof(args));
                 }
             }
             else
@@ -95,8 +96,9 @@ namespace Rosi.Runtime
                     }
                     else
                     {
-                        Log.Fatal(Tr.Get("Runtime.MainScriptMissing", args[0]), this);
-                        return;
+                        var error = Tr.Get("Runtime.MainScriptMissing", args[0]);
+                        Log.Fatal(error, this);
+                        throw new FileNotFoundException(error);
                     }
                 }
             }

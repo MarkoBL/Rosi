@@ -98,16 +98,21 @@ namespace Rosi
             }
 
 
-            var runtime = new Runtime.Runtime(null, args);
+            try
+            {
+                var runtime = new Runtime.Runtime(null, args);
 
-            Console.OutputEncoding = Encoding.UTF8;
-            Console.Title = runtime.Config.Get("rosi.title", "Rosi");
-            var result = await runtime.RunAsync();
+                Console.OutputEncoding = Encoding.UTF8;
+                Console.Title = runtime.Config.Get("rosi.title", "Rosi");
+                var result = await runtime.RunAsync();
 
-            if (runtime.Config.Get("rosi.waitforexit", false))
-                Console.ReadKey();
+                if (runtime.Config.Get("rosi.waitforexit", false))
+                    Console.ReadKey();
+                return result;
+            }
+            catch { }
 
-            return result;
+            return -1;
         }
     }
 }
