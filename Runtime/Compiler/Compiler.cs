@@ -118,6 +118,22 @@ namespace Rosi.Runtime.Compiler
                 catch { }
             }
 
+            var outputPath = compilerOptions.ScriptOutputPath;
+            if (!string.IsNullOrWhiteSpace(outputPath))
+            {
+                try
+                {
+                    var scriptPath = Path.Combine(outputPath, name);
+                    if (!loadedFromFile || !File.Exists(scriptPath))
+                    {
+                        Directory.CreateDirectory(outputPath);
+                        await File.WriteAllTextAsync(scriptPath, finalScript);
+                    }
+                }
+                catch
+                { }
+            }
+
             try
             {
                 if (!loadedFromFile)
@@ -181,22 +197,6 @@ namespace Rosi.Runtime.Compiler
 
                 result.SetError(CompilerResultType.CompileError, error);
                 return result;
-            }
-
-            var outputPath = compilerOptions.ScriptOutputPath;
-            if (!string.IsNullOrWhiteSpace(outputPath))
-            {
-                try
-                {
-                    var scriptPath = Path.Combine(outputPath, name);
-                    if (!loadedFromFile || !File.Exists(scriptPath))
-                    {
-                        Directory.CreateDirectory(outputPath);
-                        await File.WriteAllTextAsync(scriptPath, finalScript);
-                    }
-                }
-                catch
-                { }
             }
 
             result.Result = CompilerResultType.Ok;
